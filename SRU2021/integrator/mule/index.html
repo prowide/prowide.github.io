@@ -13,7 +13,7 @@
     
     
       
-        <title>Prowide MULE Connector - Developer Resources</title>
+        <title>Mule Anypoint Connector for Prowide - Developer Resources</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#prowide-mule-connector" class="md-skip">
+        <a href="#mule-anypoint-connector-for-prowide" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Prowide MULE Connector
+              Mule Anypoint Connector for Prowide
             
           </span>
         </div>
@@ -815,6 +815,34 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#user-manual" class="md-nav__link">
+    User Manual
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    Prerequisites
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardware-and-software-requirements" class="md-nav__link">
+    Hardware and Software Requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mule-compatibility" class="md-nav__link">
+    Mule Compatibility
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#requirements" class="md-nav__link">
     Requirements
   </a>
@@ -822,22 +850,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    Installation
+  <a href="#installing-the-connector" class="md-nav__link">
+    Installing the Connector
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    Configuration
+  <a href="#maven-dependency-information" class="md-nav__link">
+    Maven Dependency information
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    Usage
+  <a href="#how-to-configure" class="md-nav__link">
+    How to configure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-references" class="md-nav__link">
+    Additional References
   </a>
   
 </li>
@@ -856,8 +891,9 @@
                 
 
 
-<h1 id="prowide-mule-connector">Prowide MULE Connector</h1>
-<p>The Prowide Mule Connector for Mule 4 facilitates an out-of-the-box integration of key features from the Prowide 
+<h1 id="mule-anypoint-connector-for-prowide">Mule Anypoint Connector for Prowide</h1>
+<h2 id="user-manual">User Manual</h2>
+<p>Mule Anypoint Connector for Prowide facilitates an out-of-the-box integration of key features from the Prowide 
 libraries in MULE applications.</p>
 <p>The key features enable validation and translation of SWIFT messages in Mule flows. Including operations for the legacy
 SWIFT MT standard and the ISO 20022 MX standard.</p>
@@ -871,6 +907,12 @@ SWIFT MT standard and the ISO 20022 MX standard.</p>
 <li>Translate CBPR+ to MT</li>
 </ul>
 <p>Additional operations might be included in future releases.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>This document assumes that you are familiar with Mule 4, Anypoint Connectors, and Anypoint Studio. 
+To increase your familiarity with Studio, consider completing an Anypoint Studio Tutorial. This page requires some basic knowledge of Mule Concepts, Components in a Mule Flow, and Global Elements.</p>
+<h2 id="hardware-and-software-requirements">Hardware and Software Requirements</h2>
+<p>For hardware and software requirements, please visit the <a href="https://docs.mulesoft.com/mule-runtime/4.3/hardware-and-software-requirements">Hardware and Software Requirements page</a>.</p>
+<h2 id="mule-compatibility">Mule Compatibility</h2>
 <table>
 <thead>
 <tr>
@@ -893,25 +935,27 @@ SWIFT MT standard and the ISO 20022 MX standard.</p>
 <p>The Prowide Integrator is a set of licensed Java libraries that complements the open source libraries Prowide Core
 and Prowide ISO 20022. Thus in order to use the Prowide Mule connector, you need to have a valid license and access to 
 the Prowide Integrator libraries distribution. </p>
-<p>More information about the Prowide Integrator can be found in the
-<a href="https://www.prowidesoftware.com/products/prowide-integrator">Prowide Integrator</a> product page.</p>
-<h2 id="installation">Installation</h2>
-<p>The Prowide Mule connector is hosted in Mule Exchange and can be installed from the Exchange UI or from the Exchange
-API.</p>
-<p>https://www.anypoint.mulesoft.com/exchange/</p>
-<p>Add this dependency to your application pom.xml</p>
+<p>More information about the Prowide Integrator can be found in the <a href="https://www.prowidesoftware.com/products/prowide-integrator">Prowide Integrator</a> product page.</p>
+<h2 id="installing-the-connector">Installing the Connector</h2>
+<p>You can install the connector in Anypoint Studio using the instructions in <a href="https://docs.mulesoft.com/exchange/#installing-a-connector-from-anypoint-exchange">Installing a Connector from Anypoint Exchange</a>.</p>
+<h2 id="maven-dependency-information">Maven Dependency information</h2>
+<p>For Maven dependency management, include this XML snippet in pom.xml file in the Mule project.</p>
 <pre><code class="language-xml">&lt;groupId&gt;org.mule.modules.prowide-integrator&lt;/groupId&gt;
 &lt;artifactId&gt;mule-prowide-integrator-connector&lt;/artifactId&gt;
 &lt;version&gt;1.0.0&lt;/version&gt;
 &lt;classifier&gt;mule-plugin&lt;/classifier&gt;
 </code></pre>
-<h2 id="configuration">Configuration</h2>
+<h2 id="how-to-configure">How to configure</h2>
 <p>The Prowide Mule connector requires a valid license to be able to use the Prowide Integrator libraries. The license
 is provided as a file in the Prowide Integrator distribution. The license file must be placed in the Mule application
 classpath.</p>
 <p>The Prowide Mule connector can be configured in the Mule application configuration file or in the Mule application
 properties file. Check the Prowide Integrator developer guides for additional information.</p>
-<h2 id="usage">Usage</h2>
+<h2 id="additional-references">Additional References</h2>
+<ul>
+<li><a href="https://dev.prowidesoftware.com/SRU2021/release-notes/mule">Release notes</a></li>
+<li><a href="https://dev.prowidesoftware.com/SRU2021/release-notes/mule">Technical Reference</a></li>
+</ul>
 
               
             </article>
