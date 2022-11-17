@@ -732,6 +732,19 @@
     Parse/Build - Functional Layer
   </a>
   
+    <nav class="md-nav" aria-label="Parse/Build - Functional Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#narrativecontainer-fields" class="md-nav__link">
+    NarrativeContainer fields
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1894,6 +1907,19 @@
     Parse/Build - Functional Layer
   </a>
   
+    <nav class="md-nav" aria-label="Parse/Build - Functional Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#narrativecontainer-fields" class="md-nav__link">
+    NarrativeContainer fields
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1926,31 +1952,110 @@ persistence.</p>
 <h2 id="persistence-lightweight-layer">Persistence - Lightweight Layer</h2>
 <p>The upper layer is a generic representation for all messages mainly intended for message persistence. The model includes 
 specific attributes for header and trailer information, while the body content (business payload) is kept as a single
-<code>String</code> attribute (not parsed).
-Since this model is generic, message objects can be instantiated without prior knowledge of the specific type of message. 
+<code>String</code> attribute (not parsed).</p>
+<p>Since this model is generic, message objects can be instantiated without prior knowledge of the specific type of message. 
 This design is therefore optimal for database persistence because all message types can share a simple and efficient 
-database structure. It can be thought of as a wrapper of a swift message file.
-Besides message content, the model provides several metadata containers very useful for a message management application, 
-such as a holder for message status, attached notes and extendable properties.
-The main classes for this layer are the <code>AbstractSwiftMessage</code> and <code>MtSwiftMessage</code>.</p>
+database structure. It can be thought of as a wrapper of a swift message file.</p>
+<p>Besides message content, the model provides several metadata containers very useful for a message management application, 
+such as a holder for message status, attached notes and extendable properties.</p>
+<p>The main classes for this layer are the <code>AbstractSwiftMessage</code> and <code>MtSwiftMessage</code>.</p>
 <h2 id="parsebuild-functional-layer">Parse/Build - Functional Layer</h2>
 <p>The middle layer is a functional view of a specific message, for example an <code>MT103</code>. The provided API allows you to read 
-data from a known message easily, as well as API to build new messages.
-This layer provides a specific class for each message type, with getters for its inner sequences and fields. Also a 
+data from a known message easily, as well as API to build new messages.</p>
+<p>This layer provides a specific class for each message type, with getters for its inner sequences and fields. Also a 
 specific class for each possible field of the message, for example <code>Field32A</code>, with methods to retrieve any internal 
-component (subfield), for example the <code>Calendar</code>, <code>Currency</code> and Amount of <code>Field32A</code>.
-These specific classes can be thought of as a facade or view of the internal message content.
-The entry point for this layer is the AbstractMT and all its subclasses that represent a specific message type.</p>
+component (subfield), for example the <code>Calendar</code>, <code>Currency</code> and Amount of <code>Field32A</code>.</p>
+<p>These specific classes can be thought of as a facade or view of the internal message content.</p>
+<p>The entry point for this layer is the AbstractMT and all its subclasses that represent a specific message type.</p>
 <p>Notice these objects are not intended for message modification because when you read content with a getFieldNN the 
 returned object is detached from the underlying model. Details on how to modify a message are described later in this 
 document.</p>
+<h3 id="narrativecontainer-fields">NarrativeContainer fields</h3>
+<p>Some fields, such as <code>Field71B</code>, implements the <code>NarrativeContainer</code> interface and provide methods to access the 
+narrative content in a structured way. </p>
+<p>These fields support having a simple unstructured content split in lines and also a structured version with codewords.
+Where the codewords are separated with slashes and can be used to categorize part of the narrative content.</p>
+<p>The internal component structure for these fields is just a plain single String with the whole value. 
+But the structured content can be retrieve using:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="w">  </span><span class="n">Narrative</span><span class="w"> </span><span class="n">narrative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="na">narrative</span><span class="p">();</span><span class="w"></span>
+</code></pre></div>
+<p>Where the <code>Narrative</code> object provides methods to access the different parts of the narrative by the codewords.</p>
+<p>The <code>NarrativeResolver</code> parser can automatically detect the narrative structure and create the <code>Narrative</code> depending
+on the field value. In most of the fields the only element in the structured format is the actual text. however,
+some fields can include bank code, currency and amount, country codes or the narrative partitioned as a main narrative
+and a supplement fragments.</p>
+<p>Supported line formats are:</p>
+<ul>
+<li>
+<p>Format 1</p>
+<ul>
+<li>Line 1:         /8a/[additional information] (Code)(Narrative)</li>
+<li>Lines 2-n:      /8a/[additional information] (Code)(Narrative) or [//continuation of additional information] (Narrative)</li>
+</ul>
+</li>
+<li>
+<p>Format 2</p>
+<ul>
+<li>Line 1:         /8c/[additional information] (Code)(Narrative)</li>
+<li>Lines 2-n:      /8c/[additional information] (Code)(Narrative) or [//continuation of additional information] (Narrative)</li>
+</ul>
+</li>
+<li>
+<p>Format 3</p>
+<ul>
+<li>Line 1:         /8c/[3!a13d][additional information] (Code)(Currency)(Amount)(Narrative)</li>
+<li>Lines 2-6:      /8c/[3!a13d][additional information] (Code)(Currency)(Amount)(Narrative) or [//continuation of additional information] (Narrative)</li>
+</ul>
+</li>
+<li>
+<p>Format 4</p>
+<ul>
+<li>Line 1:         /8c/[additional information] (Code)(Narrative)</li>
+<li>
+<p>Lines 2-3:      [//continuation of additional information] (Narrative)</p>
+</li>
+<li>
+<p><strong>Variant for cat 1 with country</strong></p>
+</li>
+<li>Line 1:         /8c/2!a[//additional information] (Code)(Country)(Narrative)</li>
+<li>Lines 2-3:      [//continuation of additional information] (Narrative)</li>
+</ul>
+</li>
+<li>
+<p>Format 5</p>
+<ul>
+<li>Line 1:         /2n/[supplement 1][/supplement2] (Query Number)(Narrative 1)(Narrative 2)</li>
+<li>Lines 2-6:       /2n/[supplement 1][/supplement2] or [//continuation of supplementary information]</li>
+</ul>
+</li>
+<li>
+<p>Format 6</p>
+<ul>
+<li>Line 1:         /6c/[additional information] (Code)(Narrative)</li>
+<li>Lines 2-100:    /6c/[additional information] (Code)(Narrative) or [continuation of additional information]   (Narrative) (cannot start with slash)</li>
+</ul>
+</li>
+<li>
+<p>Format 7</p>
+<ul>
+<li>Code between slashes at the beginning of a line</li>
+</ul>
+</li>
+<li>
+<p>Format 8</p>
+<ul>
+<li>Free format codes in slashes, not necessary on new lines</li>
+</ul>
+</li>
+</ul>
+<p>The same <code>Narrative</code> model can be used to create this fields content when building messages from scratch.</p>
 <h2 id="backbone-structure-layer">Backbone - Structure Layer</h2>
 <p>The lower layer is the internal backbone of the upper one, and in most cases there is no need to use this API from an 
-application.
-The message representation at this level handles the message content as simple tuples of field name and field value and 
+application.</p>
+<p>The message representation at this level handles the message content as simple tuples of field name and field value and 
 implements low level handling of sequences and blocks. This model is quite simple, generic and loosely coupled to 
-specific messages, therefore being very efficient and requiring minimal construction constraints.
-Messages in this layer are represented by the <code>SwiftMessage</code> class, with its internal name-value tuples modeled by the
+specific messages, therefore being very efficient and requiring minimal construction constraints.</p>
+<p>Messages in this layer are represented by the <code>SwiftMessage</code> class, with its internal name-value tuples modeled by the
 <code>Tag</code> class.</p>
 <p>This layer is also the one used for content modification.</p>
 
