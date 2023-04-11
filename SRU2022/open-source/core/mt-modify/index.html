@@ -783,6 +783,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#using-the-swiftblock3builder" class="md-nav__link">
+    Using the SwiftBlock3Builder
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1935,6 +1942,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#using-the-swiftblock3builder" class="md-nav__link">
+    Using the SwiftBlock3Builder
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1951,31 +1965,43 @@
 
 <h1 id="mt-content-modification">MT content modification</h1>
 <p>This section describes common message edit use cases</p>
-<p>Since fields in an MT message are ordered, this can be tricky some times depending if the needed change involves just 
-changing existing fields content or adding new fields.</p>
+<p>The ordering of fields in an MT message can sometimes make it challenging to make changes, especially when the required modification involves adding new fields or altering the content of existing ones.</p>
 <p>Modifying content of an existing message is done with the generic backbone model; implemented in the <code>SwiftMessage</code> class 
-and in particular for the text block implementation in the <code>SwiftBlock4</code> class.</p>
+and in particular for the text block implementation in the <code>SwiftBlock3</code> and <code>SwiftBlock4</code> classes.</p>
 <p>If the message to modify has been created or parsed into an MTnnn class, the underlying model can be accessed like this:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="w">        </span><span class="n">MT103</span><span class="w"> </span><span class="n">mt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MT103</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="n">file</span><span class="p">);</span><span class="w"></span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">        </span><span class="n">SwiftBlock4</span><span class="w"> </span><span class="n">b4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mt</span><span class="p">.</span><span class="na">getSwiftMessage</span><span class="p">().</span><span class="na">getBlock4</span><span class="p">();</span><span class="w"></span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="n">SwiftBlock3</span><span class="w"> </span><span class="n">block3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mt</span><span class="p">.</span><span class="na">getSwiftMessage</span><span class="p">().</span><span class="na">getBlock3</span><span class="p">();</span><span class="w"></span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="n">SwiftBlock4</span><span class="w"> </span><span class="n">block4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mt</span><span class="p">.</span><span class="na">getSwiftMessage</span><span class="p">().</span><span class="na">getBlock4</span><span class="p">();</span><span class="w"></span>
 </code></pre></div>
 Notice the <code>MTnnn</code> classes and its getFieldnn methods are a convenient abstraction to read message content or to create 
 new messages from scratch, but they are not suitable for content modification.</p>
+<p>The <code>SwiftBlock3</code> class implements the structure of any MT message text block, it is optional, and contains special processing instructions. </p>
 <p>The <code>SwiftBlock4</code> class implements the structure of any MT message text block and provides several helpful API to retrieve 
-fields and alter content. Also it provides API to insert new fields between others.</p>
+fields and alter content. </p>
+<p>Both classes provides API to insert new fields between others.</p>
 <h2 id="updating-a-field-value">Updating a field value</h2>
 <p>Updating an existing field value or component within a field can be achieved in several ways.</p>
 <p>The simplest scenario, when a complete field value must be changed can be handled by just retrieving the generic Tag 
-object and setting its new value as a string.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">b4</span><span class="p">.</span><span class="na">getTagByName</span><span class="p">(</span><span class="s">&quot;20&quot;</span><span class="p">).</span><span class="na">setValue</span><span class="p">(</span><span class="s">&quot;NEWREFERENCE&quot;</span><span class="p">);</span><span class="w"></span>
+object and setting its new value as a string.</p>
+<p>For <code>SwiftBlock3</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">    </span><span class="n">block3</span><span class="p">.</span><span class="na">getTagByName</span><span class="p">(</span><span class="n">Field106</span><span class="p">.</span><span class="na">NAME</span><span class="p">).</span><span class="na">setValue</span><span class="p">(</span><span class="s">&quot;FOO&quot;</span><span class="p">);</span><span class="w"></span>
 </code></pre></div></p>
-<p>The <code>SwiftBlock4</code> provides several API to retrieve tags; by name and letter option, by number, by name and qualifier, etc..</p>
+<p>For <code>SwiftBlock4</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="w">    </span><span class="n">block4</span><span class="p">.</span><span class="na">getTagByName</span><span class="p">(</span><span class="s">&quot;20&quot;</span><span class="p">).</span><span class="na">setValue</span><span class="p">(</span><span class="s">&quot;NEWREFERENCE&quot;</span><span class="p">);</span><span class="w"></span>
+</code></pre></div></p>
+<p>Both <code>SwiftBlock3</code> and <code>SwiftBlock4</code> provides several API to retrieve tags; by name and letter option, by number, by name and qualifier, etc..</p>
+<p>For example, if we need to set a new value for field 103, which in this case is in the first position of the <code>SwiftBlock3</code>. 
+We can do that as follows:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="w">    </span><span class="n">block3</span><span class="p">.</span><span class="na">getTag</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="na">setValue</span><span class="p">(</span><span class="s">&quot;NEW VALUE&quot;</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
 <p>Let's say now we need to set a new value for field 57A. Since this field has several internal components (subfields) it 
 can be useful to build the new value from a <code>Field57A</code> object. We can do that as follows:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Field57A</span><span class="w"> </span><span class="n">field57A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Field57A</span><span class="p">();</span><span class="w"></span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">field57A</span><span class="p">.</span><span class="na">setAccount</span><span class="p">(</span><span class="s">&quot;12345&quot;</span><span class="p">);</span><span class="w"></span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">field57A</span><span class="p">.</span><span class="na">setBIC</span><span class="p">(</span><span class="s">&quot;NEWAESMMXXX&quot;</span><span class="p">);</span><span class="w"></span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">b4</span><span class="p">.</span><span class="na">getTagByName</span><span class="p">(</span><span class="s">&quot;57A&quot;</span><span class="p">).</span><span class="na">setValue</span><span class="p">(</span><span class="n">field57A</span><span class="p">.</span><span class="na">getValue</span><span class="p">());</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="w">    </span><span class="n">Field57A</span><span class="w"> </span><span class="n">field57A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Field57A</span><span class="p">();</span><span class="w"></span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">field57A</span><span class="p">.</span><span class="na">setAccount</span><span class="p">(</span><span class="s">&quot;12345&quot;</span><span class="p">);</span><span class="w"></span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="n">field57A</span><span class="p">.</span><span class="na">setBIC</span><span class="p">(</span><span class="s">&quot;NEWAESMMXXX&quot;</span><span class="p">);</span><span class="w"></span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="n">block4</span><span class="p">.</span><span class="na">getTagByName</span><span class="p">(</span><span class="s">&quot;57A&quot;</span><span class="p">).</span><span class="na">setValue</span><span class="p">(</span><span class="n">field57A</span><span class="p">.</span><span class="na">getValue</span><span class="p">());</span><span class="w"></span>
 </code></pre></div>
 <p>Notice how we created a new field, but then we had to load the actual Tag instance in order to overwrite its value.</p>
 <p>The <code>getValue()</code> call returns the serialization of all present field components into a proper string format. For instance 
@@ -1988,8 +2014,8 @@ in the example the resulting string would be:</p>
 example we use a Field object because it provides helpful API to manipulate internal components. But instead of creating 
 the Field object from scratch, we start by loading it from the actual message. In this example we will change just the 
 value date from the existing field 32A:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Field32A</span><span class="w"> </span><span class="n">field32A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mt</span><span class="p">.</span><span class="na">getField32A</span><span class="p">().</span><span class="na">setComponent1</span><span class="p">(</span><span class="n">Calendar</span><span class="p">.</span><span class="na">getInstance</span><span class="p">());</span><span class="w"></span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">b4</span><span class="p">.</span><span class="na">getTagByName</span><span class="p">(</span><span class="s">&quot;32A&quot;</span><span class="p">).</span><span class="na">setValue</span><span class="p">(</span><span class="n">field32A</span><span class="p">.</span><span class="na">getValue</span><span class="p">());</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Field32A</span><span class="w"> </span><span class="n">field32A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mt</span><span class="p">.</span><span class="na">getField32A</span><span class="p">().</span><span class="na">setComponent1</span><span class="p">(</span><span class="n">Calendar</span><span class="p">.</span><span class="na">getInstance</span><span class="p">());</span><span class="w"></span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">b4</span><span class="p">.</span><span class="na">getTagByName</span><span class="p">(</span><span class="s">&quot;32A&quot;</span><span class="p">).</span><span class="na">setValue</span><span class="p">(</span><span class="n">field32A</span><span class="p">.</span><span class="na">getValue</span><span class="p">());</span><span class="w"></span>
 </code></pre></div>
 <p>Notice how we first loaded the helper <code>Field32A</code> instance, which is filled with content from the internal <code>Tag</code> object. The 
 we use this field object to alter the value date. At that moment the actual message content has not been modified because 
@@ -1999,10 +2025,10 @@ modified field to update the current Tag value in the underlying message.</p>
 <p>The text block of a SWIFT message is syntactically an ordered list of fields and as such in the underlying model it is 
 actually implemented as a <code>List&lt;Tag&gt;</code>. So depending on the specific need, inserting new fields in specific positions into 
 an existing block can be tricky. Unfortunately in current version there is no easy/out-of-the-box API for this but the 
-following workaround can be handly.</p>
+following workaround can be handy.</p>
 <p>First alternative involves inserting new fields by means of plain List manipulation using Java API. This can be done in 
-combination of the indexOf methods provided by <code>SwiftBlock4</code> to select the specific positions where new fields must be 
-added. The text block can be thinked of as a String, and the provided API as <code>StringUtils</code>.</p>
+combination of the indexOf methods provided by both <code>SwiftBlock3</code> and <code>SwiftBlock4</code> to select the specific positions where new fields must be 
+added. The text block can be thought of as a String, and the provided API as <code>StringUtils</code>.</p>
 <p>Then, depending on how many fields are being added and how many remain the same, it may be also convenient to create a 
 new block, appending in order the fields from the original message plus the new ones to add.</p>
 <p>Finally, if you are comfortable manipulating XML a total different approach is to convert the SWIFT message into XML, 
@@ -2011,25 +2037,45 @@ within the API.</p>
 <p>The alternative to choose depends mainly on the use case. If the implementation is for a specific MT and use case the 
 first two options can be convenient. But if the requirements is generic, for several situations and MTs, the XML 
 approach would be better.</p>
-<p>An extension for the <code>SwiftBlock4</code> API is in the roadmap and will provide methods to insert new fields in specific index 
+<p>An extension for both <code>SwiftBlock3</code> and <code>SwiftBlock4</code> API is in the roadmap and will provide methods to insert new fields in specific index 
 based positions.</p>
 <h2 id="using-the-tag-index">Using the tag index</h2>
 <p>For the block 4 a couple of methods were also introduced to handle fields order, the <code>addTag(index, Tag)</code> and
 <code>setTag(index, Tag)</code>.</p>
 <p>The addTag at index adds a tag at the specified position in this tag list, and shifts the element currently at that 
 position (if any) and any subsequent elements to the right (adds one to their indices).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">SwiftBlock4</span><span class="w"> </span><span class="n">b4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SwiftBlock4</span><span class="p">();</span><span class="w"></span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">b4</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Tag</span><span class="p">(</span><span class="s">&quot;20:PAY01&quot;</span><span class="p">));</span><span class="w"></span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">b4</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Tag</span><span class="p">(</span><span class="s">&quot;23B:CRED&quot;</span><span class="p">));</span><span class="w"></span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">b4</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Tag</span><span class="p">(</span><span class="s">&quot;71A:SHA&quot;</span><span class="p">));</span><span class="w"></span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">b4</span><span class="p">.</span><span class="na">addTag</span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Tag</span><span class="p">(</span><span class="s">&quot;21:RELREF&quot;</span><span class="p">)));</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="w">    </span><span class="n">SwiftBlock4</span><span class="w"> </span><span class="n">b4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SwiftBlock4</span><span class="p">();</span><span class="w"></span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="n">b4</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Tag</span><span class="p">(</span><span class="s">&quot;20:PAY01&quot;</span><span class="p">));</span><span class="w"></span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="n">b4</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Tag</span><span class="p">(</span><span class="s">&quot;23B:CRED&quot;</span><span class="p">));</span><span class="w"></span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="n">b4</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Tag</span><span class="p">(</span><span class="s">&quot;71A:SHA&quot;</span><span class="p">));</span><span class="w"></span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="n">b4</span><span class="p">.</span><span class="na">addTag</span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Tag</span><span class="p">(</span><span class="s">&quot;21:RELREF&quot;</span><span class="p">)));</span><span class="w"></span>
 </code></pre></div>
 <p>At this point the tag list will contain fields: 20, 21, 23B and 71A</p>
 <p>Then the setTag at index replaces the tag at the specified position in the tag list with the new tag.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">b4</span><span class="p">.</span><span class="na">setTag</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Tag</span><span class="p">(</span><span class="s">&quot;32A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;180419USD1234,&quot;</span><span class="p">)));</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="w">    </span><span class="n">b4</span><span class="p">.</span><span class="na">setTag</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Tag</span><span class="p">(</span><span class="s">&quot;32A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;180419USD1234,&quot;</span><span class="p">)));</span><span class="w"></span>
 </code></pre></div>
 At this point the tag list will contain fields: 20, 32A, 23B and 71A</p>
 <p>Reference for block 4 manipulation API can be found online at <code>SwiftTagListBlock</code></p>
+<h2 id="using-the-swiftblock3builder">Using the SwiftBlock3Builder</h2>
+<p>The <code>SwiftBlock3Builder</code> class provides a convenient API to build a <code>SwiftBlock3</code> instance from scratch. It is useful 
+when you need to create a new message from scratch, or when you need to modify the block 3 of an existing message. 
+This class ensures that only expected fields are set and fields are set in proper order. 
+Each time a new field is set, the internal tag list will be updated in proper order.</p>
+<p>The following example shows how to create a new block 3 from scratch:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="w">        </span><span class="c1">//this will setup all  the fields in the proper order</span><span class="w"></span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">        </span><span class="n">SwiftBlock3</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SwiftBlock3</span><span class="p">();</span><span class="w"></span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">        </span><span class="n">SwiftBlock3Builder</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">builder</span><span class="p">();</span><span class="w"></span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">        </span><span class="n">builder</span><span class="w"></span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">        </span><span class="p">.</span><span class="na">setField121</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Field121</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">))</span><span class="w"></span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">        </span><span class="p">.</span><span class="na">setField106</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Field106</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">))</span><span class="w"></span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">        </span><span class="p">.</span><span class="na">setField165</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Field165</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">))</span><span class="w"></span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">        </span><span class="p">.</span><span class="na">setField106</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Field106</span><span class="p">(</span><span class="s">&quot;finalValue106&quot;</span><span class="p">))</span><span class="w"></span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">        </span><span class="p">.</span><span class="na">setField108</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Field108</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">));</span><span class="w"></span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">        </span><span class="c1">//this will set the field 121 again, in the proper position, and update the internal Field list</span><span class="w"></span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">        </span><span class="n">b</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span><span class="w"></span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">            </span><span class="p">.</span><span class="na">setField121</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Field121</span><span class="p">(</span><span class="s">&quot;another_foo&quot;</span><span class="p">))</span><span class="w"></span>
+</code></pre></div>
 
               
             </article>
