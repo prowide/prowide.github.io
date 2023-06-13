@@ -2006,17 +2006,6 @@ hierarchy to do the parsing, then cast if necessary to extract specific data.</p
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Message id: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">camt</span><span class="p">.</span><span class="na">getModfyRsvatn</span><span class="p">().</span><span class="na">getMsgHdr</span><span class="p">().</span><span class="na">getMsgId</span><span class="p">());</span><span class="w"></span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">}</span><span class="w"></span>
 </code></pre></div>
-<p>The MX message model classes, such as <code>MxPacs00800108</code>, that extend the <code>AbstractMX</code> are designed to parse and create 
-<strong>specific message types</strong>.</p>
-<p>The <code>AbstractMX</code> is simply the parent class of the model hierarchy, and it is <strong>abstract</strong>. Thus, it is not intended to 
-create messages from scratch, and in fact, you cannot create a new empty instance of it. It is only created in <strong>parse 
-method calls</strong>.</p>
-<p>If you parse an XML with a specific model class, any element in the XML that does not belong to the specific schema 
-is automatically dropped. This is because the model classes are designed for specific types. This means that you cannot 
-parse an element such as /Document/GrpHdr/InstrctdAgt into a model if that model does not define such a path or element.</p>
-<p>When you parse an XML with the <code>AbstractMX</code>, the API internally autodetects the message type from the namespace and parses 
-the XML with a specific model class. The <code>AbstractMX</code> is just a way to process messages without autodetecting or creating 
-specific instances yourself.</p>
 <h2 id="parsing-many-unknown-message-types">Parsing many unknown message types</h2>
 <p>When you need to parse many unknown message types and just store the content in a database or read generic metadata 
 that is common to all messages (such as the message type, sender, receiver and reference) you can use the generic
@@ -2038,11 +2027,6 @@ underlying XML structure is directly traversed.</p>
 </code></pre></div>
 <p>This <code>XmlNode</code> is a generic, lightweight and fast xml tree representation that can be used to traverse or build any XML.
 You can think of it as a simplified DOM. It lack several features of a full DOM but it is much faster and lightweight.</p>
-<p>The <code>XmlNode</code> model and all its methods are part of a generic XML API. Its purpose is to provide an easy-to-use, generic XML 
-handling API to avoid using Java's native APIs such as DOM, SAX, Stax, etc.</p>
-<p>The <code>XmlNode</code> model is not specific to ISO 20022. You can use it to parse or create any XML structure.</p>
-<p>In particular, you can use the <code>XmlNode</code> model to generically parse or create MX messages. However, the model itself does not 
-impose any restrictions on what you can do.</p>
 <h2 id="performance-jaxbcontext-cache">Performance: JaxbContext cache</h2>
 <p>The parse methods available in the specific classes such as <code>MxCamt00300104</code> or in the <code>AbstractMX</code> class uses JAXB
 unmarshaller. By default implementation will create a new <code>JAXBContext</code> for each parse invocation. While this is fine when
