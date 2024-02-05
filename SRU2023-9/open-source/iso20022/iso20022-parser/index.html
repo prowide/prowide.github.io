@@ -2134,19 +2134,19 @@ InputStream, AbstractMX, etc...</p>
 <p>If you need to read specific attributes not available in the generic metadata, you can use the specific classes such as
 <code>MxSese02300201</code> to read specific data.</p>
 <h2 id="reading-specific-attributes-from-many-message-types">Reading specific attributes from many message types</h2>
-<p>Finally, you have yet another option if you need to read many attributes (not available in the <code>MtSwiftMessage</code> metadata) 
-from many known or unknown message types. This alternative low level where the model objects are not used and the 
-underlying XML structure is directly traversed.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">XmlNode</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">XmlParser</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="n">document</span><span class="p">);</span><span class="w"></span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">XmlNode</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">.</span><span class="na">findFirstByName</span><span class="p">(</span><span class="s">&quot;/Document/etc&quot;</span><span class="p">);</span><span class="w"></span>
+<p>Finally, you have yet another option if you need to read many attributes (not available in the <code>MtSwiftMessage</code> metadata) from 
+many known or unknown message types. This is an alternative, low-level approach where the model objects are not used, 
+and the underlying XML structure is directly traversed.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">MxNode</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MxNode</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="n">document</span><span class="p">);</span><span class="w"></span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">String</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">.</span><span class="na">singlePathValue</span><span class="p">(</span><span class="s">&quot;/Document/etc&quot;</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
-<p>This <code>XmlNode</code> is a generic, lightweight and fast xml tree representation that can be used to traverse or build any XML.
-You can think of it as a simplified DOM. It lack several features of a full DOM but it is much faster and lightweight.</p>
-<p>The <code>XmlNode</code> model and all its methods are part of a generic XML API. Its purpose is to provide an easy-to-use, generic XML 
+<p>This <code>MxNode</code> is a generic, lightweight, and fast XML tree representation that can be used to traverse or build any XML. 
+You can think of it as a simplified DOM. It lacks several features of a full DOM but is much faster and lighter.</p>
+<p>The <code>MxNode</code> model and all its methods are part of a generic XML API. Its purpose is to provide an easy-to-use, generic XML 
 handling API to avoid using Java's native APIs such as DOM, SAX, Stax, etc.</p>
-<p>The <code>XmlNode</code> model is not specific to ISO 20022. You can use it to parse or create any XML structure.</p>
-<p>In particular, you can use the <code>XmlNode</code> model to generically parse or create MX messages. However, the model itself does not 
-impose any restrictions on what you can do.</p>
+<p>The <code>MxNode</code> model is not specific to ISO 20022. You can use it to parse or create any XML structure.</p>
+<p>In particular, you can use the <code>MxNode</code> model to generically parse or create MX messages. However, the model itself does 
+not impose any restrictions on what you can do.</p>
 <h2 id="performance-jaxbcontext-cache">Performance: JaxbContext cache</h2>
 <p>The parse methods available in the specific classes such as <code>MxCamt00300104</code> or in the <code>AbstractMX</code> class uses JAXB
 unmarshaller. By default implementation will create a new <code>JAXBContext</code> for each parse invocation. While this is fine when
