@@ -941,6 +941,26 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#hybrid-addresses" class="md-nav__link">
+    Hybrid addresses
+  </a>
+  
+    <nav class="md-nav" aria-label="Hybrid addresses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prowide-integrator-hybrid-addresses-handling-in-sru2025" class="md-nav__link">
+    Prowide Integrator hybrid addresses handling in SRU2025
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2041,6 +2061,26 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#hybrid-addresses" class="md-nav__link">
+    Hybrid addresses
+  </a>
+  
+    <nav class="md-nav" aria-label="Hybrid addresses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prowide-integrator-hybrid-addresses-handling-in-sru2025" class="md-nav__link">
+    Prowide Integrator hybrid addresses handling in SRU2025
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2103,6 +2143,35 @@ for each possible type defined in the MX standard for example: <code>AccountPart
 <h2 id="supported-mx-versions">Supported MX Versions</h2>
 <p>The library accumulates all historic versions for all message categories. And it is yearly updated with new versions of 
 messages added per SRU.</p>
+<h2 id="hybrid-addresses">Hybrid addresses</h2>
+<p>The message model already supports setting a combination of structured and unstructured content. The acceptance of 
+hybrid address is related to the network <strong>validations</strong>. </p>
+<p>The network will start accepting hybrid addresses starting by the end of <strong>November 2025</strong>, when the <strong>SRU2025</strong> 
+goes live.</p>
+<p>Then a year later, by <strong>November 2026</strong> only structured content will be accepted.</p>
+<p><img alt="SWIFT calendar for hybrid addresses" src="../../../assets/images/hybrid-addresses.png" /></p>
+<p>In any case notice the library API will not split unstructured content into structured content.</p>
+<p>Automatic structuring of unstructured address content is something that should be achieved with heuristics, based on 
+sample data. As a custom process for each institution because it depends on the institution's data and how the data is
+collected and maintain in the backoffice and front desk applications.</p>
+<p>The SWIFT release calendar is giving enough time to the industry to modernize their system and start collecting and 
+storing the addresses already in a structured way. This means, supporting structured addresses end to end.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<h4 id="prowide-integrator-hybrid-addresses-handling-in-sru2025">Prowide Integrator hybrid addresses handling in SRU2025</h4>
+<ul>
+<li>
+<p>Validation: The validation component will start to accept the mixed content. </p>
+</li>
+<li>
+<p>Translations: The translation component will generate hybrid addresses whenever possible. If the MT source is
+structured, the translation will generate a fully structured content in the MX. If the source is unstructured but part 
+of the content is structured, the translation will generate a hybrid address. But finally if the source is unstructured, 
+it will be propagated as is to the translated MX.</p>
+</li>
+</ul>
+<p>Until SRU2025 the model, validation and translation will only accept structured or unstructured content in the MX.</p>
+</div>
 
               
             </article>
