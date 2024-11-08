@@ -1068,6 +1068,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#backward-compatibility-transitioning-from-java-8-to-java-11-in-abstractmx" class="md-nav__link">
+    Backward Compatibility: Transitioning from Java 8 to Java 11 in AbstractMX
+  </a>
+  
+    <nav class="md-nav" aria-label="Backward Compatibility: Transitioning from Java 8 to Java 11 in AbstractMX">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#abstractmx-json-v9-methods" class="md-nav__link">
+    AbstractMX JSON V9 Methods
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2228,6 +2248,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#backward-compatibility-transitioning-from-java-8-to-java-11-in-abstractmx" class="md-nav__link">
+    Backward Compatibility: Transitioning from Java 8 to Java 11 in AbstractMX
+  </a>
+  
+    <nav class="md-nav" aria-label="Backward Compatibility: Transitioning from Java 8 to Java 11 in AbstractMX">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#abstractmx-json-v9-methods" class="md-nav__link">
+    AbstractMX JSON V9 Methods
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2967,6 +3007,62 @@ the <code>MxSwiftMessage#fromJson(String json)</code> method should be used.</p>
 <a id="__codelineno-21-84" name="__codelineno-21-84" href="#__codelineno-21-84"></a><span class="w">    </span><span class="n">assertEquals</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span><span class="w"> </span><span class="n">lastModified</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Calendar</span><span class="p">.</span><span class="na">MINUTE</span><span class="p">));</span><span class="w"></span>
 <a id="__codelineno-21-85" name="__codelineno-21-85" href="#__codelineno-21-85"></a><span class="w">    </span><span class="n">assertEquals</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span><span class="w"> </span><span class="n">lastModified</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Calendar</span><span class="p">.</span><span class="na">SECOND</span><span class="p">));</span><span class="w"></span>
 </code></pre></div>
+<h3 id="backward-compatibility-transitioning-from-java-8-to-java-11-in-abstractmx">Backward Compatibility: Transitioning from Java 8 to Java 11 in <code>AbstractMX</code></h3>
+<p>As part of the migration from Java 8 to Java 11, <code>AbstractMX</code> has introduced new methods that ensure backward compatibility, specifically in the context of JSON serialization and deserialization. These methods address the changes in how date-time information is handled, transitioning from the use of <code>XMLGregorianCalendar</code> in Java 8 to <code>OffsetDateTime</code> in Java 11.</p>
+<h4 id="abstractmx-json-v9-methods"><code>AbstractMX</code> JSON V9 Methods</h4>
+<p>To manage the transition, <code>AbstractMX</code> provides two methods: <code>fromJsonV9()</code> and <code>toJsonV9()</code>. These methods are designed to work with JSON data that was generated using the legacy <code>XMLGregorianCalendar</code> format while seamlessly transitioning to the newer <code>OffsetDateTime</code> format.</p>
+<ul>
+<li><strong><code>toJsonV9()</code></strong>: This method allows you to serialize an <code>AbstractMX</code> message into a JSON format that is compatible with systems that still expect the older <code>XMLGregorianCalendar</code> format. When invoked, this method will structure the JSON data in a way that closely mirrors the legacy format, ensuring that date-time fields are represented in a backward-compatible way.</li>
+</ul>
+<p>Example:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">AbstractMX</span><span class="w"> </span><span class="n">mxMessage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MxPacs00900108</span><span class="p">();</span><span class="w"></span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="n">String</span><span class="w"> </span><span class="n">jsonV9</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mxMessage</span><span class="p">.</span><span class="na">toJsonV9</span><span class="p">();</span><span class="w"></span>
+</code></pre></div></p>
+<p>This produces a JSON output where date-time fields are serialized in a way that resembles how they were handled with <code>XMLGregorianCalendar</code> in Java 8.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="err">...</span><span class="w"></span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span><span class="nt">&quot;creDtTm&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">  </span><span class="nt">&quot;year&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2022</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">  </span><span class="nt">&quot;month&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="w">  </span><span class="nt">&quot;day&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="w">  </span><span class="nt">&quot;timezone&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">-180</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="w">  </span><span class="nt">&quot;hour&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="w">  </span><span class="nt">&quot;minute&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">43</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="w">  </span><span class="nt">&quot;second&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">57</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="w">  </span><span class="nt">&quot;fractionalSecond&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.412</span><span class="w"></span>
+<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="w">  </span><span class="p">},</span><span class="w"></span>
+<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="err">...</span><span class="w"></span>
+</code></pre></div></p>
+<ul>
+<li><strong><code>fromJsonV9()</code></strong>: This method allows the deserialization of JSON data that was generated using the older <code>XMLGregorianCalendar</code> format, converting it into the modern <code>OffsetDateTime</code> format used in Java 11. This ensures that older JSON data can still be processed in a Java 11 environment.</li>
+</ul>
+<p>Example:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">String</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;{...</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="s">    &quot;</span><span class="n">creDtTm</span><span class="s">&quot;: {</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="s">    &quot;</span><span class="n">year</span><span class="s">&quot;: 2022,</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="s">    &quot;</span><span class="n">month</span><span class="s">&quot;: 11,</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="s">    &quot;</span><span class="n">day</span><span class="s">&quot;: 30,</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="s">    &quot;</span><span class="n">timezone</span><span class="s">&quot;: -180,</span>
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="s">    &quot;</span><span class="n">hour</span><span class="s">&quot;: 10,</span>
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="s">    &quot;</span><span class="n">minute</span><span class="s">&quot;: 43,</span>
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="s">    &quot;</span><span class="n">second</span><span class="s">&quot;: 57,</span>
+<a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="s">    &quot;</span><span class="n">fractionalSecond</span><span class="s">&quot;: 0.412</span>
+<a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="s">      },</span>
+<a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a><span class="s">  ...}&quot;</span><span class="p">;</span><span class="w">  </span><span class="c1">// JSON data produced from XMLGregorianCalendar</span><span class="w"></span>
+<a id="__codelineno-24-13" name="__codelineno-24-13" href="#__codelineno-24-13"></a><span class="n">AbstractMX</span><span class="w"> </span><span class="n">mxMessage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AbstractMX</span><span class="p">.</span><span class="na">fromJsonV9</span><span class="p">(</span><span class="n">json</span><span class="p">);</span><span class="w"></span>
+</code></pre></div></p>
+<p>This method parses the JSON, converting legacy date-time fields into <code>OffsetDateTime</code>, while maintaining compatibility with systems that produced data in the Java 8 format.</p>
+<p>This methods allows: </p>
+<ol>
+<li>
+<p><strong>Seamless Migration</strong>: The <code>toJsonV9()</code> and <code>fromJsonV9()</code> methods ensure that migrating to Java 11 does not disrupt systems that are still using JSON data generated with Java 8. This allows systems to handle both legacy and modern date-time formats without manual intervention.</p>
+</li>
+<li>
+<p><strong>Compatibility Across Versions</strong>: These methods allow you to maintain compatibility with older systems while adopting the modern <code>OffsetDateTime</code> format. Systems that have already transitioned to Java 11 can still interact with services or applications that are based on Java 8 and <code>XMLGregorianCalendar</code>.</p>
+</li>
+<li>
+<p><strong>Preservation of Existing Data</strong>: By using <code>fromJsonV9()</code>, you can continue to work with existing JSON data that was serialized using <code>XMLGregorianCalendar</code> without needing to reformat or update it, reducing the risk of data loss or corruption during migration.</p>
+</li>
+</ol>
 
               
             </article>
