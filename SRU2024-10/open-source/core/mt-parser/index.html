@@ -802,6 +802,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#base64-block4-parsing" class="md-nav__link">
+    Base64 block4 parsing
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2113,6 +2120,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#base64-block4-parsing" class="md-nav__link">
+    Base64 block4 parsing
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2272,8 +2286,37 @@ The "val32a" String will contain the value "050902JPY3520000," and "list71" will
 "EUR12,00" and "EUR2,34".</p>
 <p>The <code>SwiftBlock4</code> object basically contains an ordered List of fields found content body of the SWIFT message and provides 
 several API to manipulate and get the tags individually or by sub blocks. At this API level the message body can be 
-think of as a text string, where instead of characters we found message fields and we can get for example all Tags 
+thought of as a text string, where instead of characters we found message fields and we can get for example all Tags 
 before a given one, Tags between boundaries, etc.. This API is the base foundation of the high level Sequences API.</p>
+<h2 id="base64-block4-parsing">Base64 block4 parsing</h2>
+<p>The <code>SwiftParser</code> provides also useful API when the message content to parse is not complete, but partial. </p>
+<p>Several SWIFT interfaces for example provide the MT text block content encoded in base64, and without boundary brackets. 
+For example, you might get a base64 string that represents the block 4 content of a message like this:</p>
+<div class="highlight"><pre><span></span><code>    :20:LOW-000082027617
+    :28D:12345/12345
+    :50L:x
+    :50H:/x
+    x
+    :30:961123
+    :21:LOW-000082027617
+    :32B:USD1,34
+    :52A:CHASUS33
+    :59:x
+    :71A:SHA
+    :21:LOW-000082027617
+    :32B:USD1,34
+    :52A:CHASUS33
+    :59:x
+    :71A:SHA
+</code></pre></div>
+<p>Then in order to parse that, you can create the message and its block 4 manually like this:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">SwiftMessage</span><span class="w"> </span><span class="n">sm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SwiftMessage</span><span class="p">();</span><span class="w"></span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">sm</span><span class="p">.</span><span class="na">setBlock4</span><span class="p">(</span><span class="n">SwiftParser</span><span class="p">.</span><span class="na">parseBlock4</span><span class="p">(</span><span class="s">&quot;{4:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">FINWriterVisitor</span><span class="p">.</span><span class="na">SWIFT_EOL</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;-}&quot;</span><span class="p">));</span><span class="w"></span>
+</code></pre></div>
+<p>Where the payload variable contains the base64 decoded content. This will parse the block 4 content and create the
+all Tag elements as needed.</p>
+<p>Then you can add the block 1 and 2 headers and optionally a block 3 and trailer block 5, also manually by creating and
+populating the block objects using the model.</p>
 
               
             </article>
