@@ -1898,6 +1898,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#961-june-2025" class="md-nav__link">
+    9.6.1 - June 2025
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#960-june-2025" class="md-nav__link">
     9.6.0 - June 2025
   </a>
@@ -3409,6 +3416,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#961-june-2025" class="md-nav__link">
+    9.6.1 - June 2025
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#960-june-2025" class="md-nav__link">
     9.6.0 - June 2025
   </a>
@@ -4795,6 +4809,34 @@
 
 
 <h1 id="prowide-integrator-translations-changelog">Prowide Integrator Translations - CHANGELOG</h1>
+<h4 id="961-june-2025">9.6.1 - June 2025</h4>
+<ul>
+<li>(PW-2529) MT202 -&gt; pacs.009.001.*: fixed mapping from field 72 into RemittanceInformation/Unstructured when codeword text starts with a character followed by a slash (/BNF/A/C)</li>
+<li>(PW-2527) CBPR+ pacs.008.001.08 -&gt; MT103: removed extra dashes in field 50F line 4/ when mapping from Debtor date of birth</li>
+<li>(PW-2527) CBPR+ pacs.008.001.08 -&gt; MT103: fixed mapping from InstructionForCreditorAgent into 23E when code is CHQB removing the additional information from 23E and adding an extra /ACC/ codeword in field 72</li>
+<li>(PW-2527) CBPR+ pacs.008.001.08 -&gt; MT103: fixed mapping order from InstructionForCreditorAgent into 23E (CHQB, HOLD, PHOB, TELB)</li>
+<li>(PW-2527) CBPR+ pacs.008.001.08 -&gt; MT103: fixed mapping from DebtorAccount and CreditorAccount into 50F and 59F when element Identification\Other is present</li>
+<li>(PW-2527) MX to MT translators: fixed mapping from PaymentTypeInformation\ServiceLevel\Code to Block3\111 when multiple codes with G00* pattern are present</li>
+<li>(PW-2522) MT to MX translators: removed mapping from field 72 codeword /SVCLVL/ with value SDVA and added value INST as a valid code into ServiceLevel</li>
+<li>(PW-2522) MT to MX translators: truncation to 35x and removed extra space when mapping field 72 codewords /SVCLVL/ /LOCINS/ /CATPURP/ /PURP/ into ServiceLevel/LocalInstrument/CategoryPurpose/Purpose</li>
+<li>(PW-2522) MT to MX translators: removed extra space when mapping field 72 codewords /INS/ into PreviousInstructingAgent1/PreviousInstructingAgent2/PreviousInstructingAgent3</li>
+<li>(PW-2520) xsys.003.001.001/xsys.012.001.001 -&gt; MT019: added mapping from ClearingSystemCode to field 619</li>
+<li>(PW-2518) MT to MX translators: fixed mapping from multiple 23E into InstructionForCreditorAgent when field 72 contains /ACC/ codeword</li>
+<li>(PW-2517) MT to MX translators: removed extra space when mapping from 50F-59F into Debtor/Name-Creditor/Name with multiple 1/ lines and first line is 35x length</li>
+<li>(PW-2516) ISO pacs.009.001.* -&gt; MT202 : added additional mapping for PaymentTypeInformation\ServiceLevel\Code to Block3\111</li>
+<li>(PW-2513) MT to MX translators: added missing mapping from field72 into InstructionForCreditorAgent when multiple /ACC/ codewords are present</li>
+<li>(PW-2513) MT to MX translators: removed concatenation separator when mapping field 72 codeword /INTA/Name(Country(TownName into IntermediaryAgent2 and IntermediaryAgent3 when multiple lines are used</li>
+<li>(PW-2513) MT to MX translators: use the translation configuration "EnforceTwoDecimalPlaces" flag to enable the formatting of amounts using the currency decimal places</li>
+<li>(PW-2504) MT to MX translators: added missing IBAN element when mapping from 52C/56C/57C into DebtorAgentAccount/IntermediaryAgent1Account/CreditorAgentAccount</li>
+<li>(PW-2504) MT to MX translators: added missing ClearingSystemMemberIdentification element when mapping from 57B into CreditorAgent</li>
+<li>(PW-2504) MT to MX translators: added missing OrganisationIdentification\LEI element when mapping from 50F/59F into Debtor/Creditor containing line 3/<Country>/LEIC/<LEI> or 6/<Country>/LEIC/<LEI></li>
+<li>(PW-2504) MT102/MT103 -&gt; pacs.008.001.<em> - MT202/MT205 -&gt; pacs.009.001.</em>: truncation to 35x when mapping narrative 72 codewords /CATPURP/ into CategoryPurpose\Proprietary and /LOCINS/ into LocalInstrument\Proprietary</li>
+<li>(PW-2488) MT to MX translators: fixed mapping case from 50F to Debtor\Identification\PrivateIdentification\Other when 50F/Party Identifier contains additional slashes and is equal to 27x</li>
+<li>(PW-2346) CHATS Translators: support for CHATS v1.4</li>
+<li>Added CBPR+ translator camt.054.001.08 -&gt; MT103</li>
+<li>Added CBPR+ translator camt.054.001.08 -&gt; MT202</li>
+<li>Added CBPR+ translator admi.024.001.01 -&gt; MT199</li>
+</ul>
 <h4 id="960-june-2025">9.6.0 - June 2025</h4>
 <ul>
 <li>SWIFT Standard release update 2025 (live 22 November 2025)</li>
@@ -4807,14 +4849,14 @@
 <li>(PW-2500) Fixed MxToMtAgent: truncation size of Name(Country(TownName (/INTA/ case for field 72)</li>
 <li>(PW-2500) Fixed MxToMtFinancialInstitutionNameAndStructuredAddress: truncation to 35x instead of 33x (52D, 57D and 58D)</li>
 <li>(PW-2500) Fixed MxToMt72FullField2: truncation to 35x instead of 33x for /SVCLVL/ /PHONEBEN/ /TELEBEN/ codewords in field 72</li>
-<li>(PW-2498) Fixed MxToMt72FullField2: InstructionForCreditorAgent code PHOB translated to PHONBEN (not PHONEBEN) and map /PHONBEN/ and /TELEBEN/ to different lines in field 72 </li>
+<li>(PW-2498) Fixed MxToMt72FullField2: InstructionForCreditorAgent code PHOB translated to PHONBEN (not PHONEBEN) and map /PHONBEN/ and /TELEBEN/ to different lines in field 72</li>
 <li>(PW-2498) ISO pacs.008.001.<em> -&gt; MT103 - pacs.009.001.</em> -&gt; MT202 : added mappings for SettlementTimeIndication TillTime, FromTime and RejectTime into 13C TILTIME, FROTIME and REJTIME</li>
 <li>(PW-2495) MT to MX translators: fixed mapping from 50F lines 6/ and 8/ into Debtor\Identification\PrivateIdentification\Other</li>
 <li>(PW-2494) MT to MX translators: included missing case for mapping 59\Account containing //CH into CreditorAccount</li>
 <li>(PW-2488) MT103 -&gt; pacs.008.001.08 - MT202/MT205 -&gt; pacs.009.001.08: added Name(Country(TownName case for mapping from field 72 codeword /INTA/ into IntermediaryAgent2 and IntermediaryAgent3</li>
 <li>(PW-2486) CBPR+ pacs.009.001.08 -&gt; MT200/MT202/MT205: fixed mapping from Creditor into 57A when ClearingSystemIdentification is present</li>
 <li>(PW-2485) Translators: Added new translate method that accepts an MT FIN or MX XML string as input parameter</li>
-<li>(PW-2483) CBPR+ MT102/MT103 -&gt; pacs.008.001.08: included missing 23E:SDVA mapping into PaymentTypeInformation/ServiceLevel when there is also a field 72 codeword /SVCLVL/ or Block3\111 </li>
+<li>(PW-2483) CBPR+ MT102/MT103 -&gt; pacs.008.001.08: included missing 23E:SDVA mapping into PaymentTypeInformation/ServiceLevel when there is also a field 72 codeword /SVCLVL/ or Block3\111</li>
 <li>ISO MT103/MT202/MT205 -&gt; pacs.004.001.*: enhanced mapping from Narrative 72 into ReturnReasonInformation</li>
 <li>ISO MT900/MT910 -&gt; camt.054.001.*: added mapping from 25P into Notification\Account</li>
 </ul>
