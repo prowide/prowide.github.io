@@ -1898,6 +1898,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#962-july-2025" class="md-nav__link">
+    9.6.2 - July 2025
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#961-june-2025" class="md-nav__link">
     9.6.1 - June 2025
   </a>
@@ -3416,6 +3423,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#962-july-2025" class="md-nav__link">
+    9.6.2 - July 2025
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#961-june-2025" class="md-nav__link">
     9.6.1 - June 2025
   </a>
@@ -4809,6 +4823,48 @@
 
 
 <h1 id="prowide-integrator-translations-changelog">Prowide Integrator Translations - CHANGELOG</h1>
+<h4 id="962-july-2025">9.6.2 - July 2025</h4>
+<ul>
+<li>(PW-2579) MX to MT translators: added extra slash when mapping ClearingSystemMemberIdentification into 52A/57A with missing ClearingSystemIdentification\Code</li>
+<li>(PW-2577) CBPR+ MT to MX translators: added dummy date 0001-01-01 to map 13C into SettlementTimeIndication\DebitDateTime and SettlementTimeIndication\CreditDateTime</li>
+<li>(PW-2577) CBPR+ MT to MX translators: fixed mapping from 72 /SVCLVL/ into PaymentTypeInformation\ServiceLevel</li>
+<li>(PW-2574) CBPR+ pacs.009 -&gt; MT200/MT202/MT205: fixed mapping from CreditorAgent to 57B instead of 57D when CreditorAgent\Name is not present or is NOTPROVIDED</li>
+<li>(PW-2567) ISO MT502 -&gt; setr.004.<em>/setr.010.</em>: additional mapping from 98A/98C NAVD date into MultipleOrderDetails\ExpiryDateTime</li>
+<li>(PW-2566) Adapted specific translations for RITS (Australian RTGS) using HVCS UG2025 guidelines </li>
+<li>(PW-2561) xsys.002.001.001 -&gt; MT012 - xsys.001.001.001 -&gt; MT097: added mapping from ClearingSystemCode to field 103</li>
+<li>(PW-2556) ISO camt.054.001.* -&gt; MT900/MT910: removed precondition checking existence of RelatedParties\Debtor</li>
+<li>(PW-2554) CBPR+ MT103/MT202/MT205 -&gt; pacs.004: added NOTPROVIDED Address Line for special cases when mapping 50a/56a/57a/59a</li>
+<li>(PW-2554) CBPR+ MT103/MT202/MT205 -&gt; pacs.004: removed mappings from 72 /INS/ into Previous Instructing Agent 1/2/3</li>
+<li>(PW-2554) CBPR+ MT103 -&gt; pacs.004: added dummy mapping into ReturnedInstructedAmount when ChargesInformation is mapped and field 33B is not present</li>
+<li>(PW-2553) CBPR+ pacs.004 -&gt; MT103/MT202/MT205: added missing mapping for Party Identifier in fields 52A/52D/56A/56D/57A/57D/58A/58D</li>
+<li>(PW-2370) Added ISO translator MT202 -&gt; camt.050.001.05</li>
+<li>(PW-2558) MT202COV/MT205COV -&gt; pacs.009.001.08.COV: added missing ClearingSystemMemberIdentification element when mapping from 57B into CreditorAgent</li>
+<li>(PW-2548) ISO seev.031.001.* -&gt; MT564/MT568: removed mapping into field 28E when Pagination element is not present</li>
+<li>(PW-2546) MT to MX translators: fixed logic for mapping field 50F line 3/<Country>/LEIC/<LEI> into Debtor\Identification\OrganisationIdentification\LEI (only if 50F/PartyIdentifier starts with slash)</li>
+<li>(PW-2546) CBPR+ MT to MX translators: limit to three (3) occurrences the PaymentTypeInformation\ServiceLevel mapping</li>
+<li>(PW-2545) MT103 -&gt; pacs.004.001.09: fixed mapping from field 71A into TransactionInformation\ChargeBearer (OUR into SHAR instead of DEBT)</li>
+<li>(PW-2544) CBPR+ pacs.008.001.08 -&gt; MT102/MT103: removed mapping from Creditor\Identification\OrganisationIdentification into field 59F Party Identifier</li>
+<li>(PW-2541) MT to MX: fixed mapping from field 70 with codewords (i.e. /ULTD/ and /ULTB/) wrapped into multiple lines</li>
+<li>(PW-2540) MX to MT: Revamped implementation of MxToMtRegulatoryReporting2 for translation into field 77B</li>
+<li>(PW-2540) (PW-2555) CBPR+ pacs.008.001.08 -&gt; MT103: truncation to 30x when mapping InstructionForCreditorAgent\InstructionInformation into field 23E\Additional Information</li>
+<li>(PW-2539) Added MT101_MxPain00100103_BulkTranslation class</li>
+<li>(PW-2538) CBPR+ pacs.004 -&gt; MT103: mapping Debtor/Agent into 50K instead of 50F and removed dashes from line 4/ Birth Date</li>
+<li>(PW-2538) CBPR+ pacs.004 -&gt; MT103: added missing specific case mappings into 52A/D, 56A/D and 57A/D and added missing time indications 13C</li>
+<li>(PW-2538) CBPR+ pacs.004 -&gt; MT103: fixed translation from UltimateDebtor and UltimateCreditor into field 70 and missing CityOfResidence tags into field 77B</li>
+<li>(PW-2534) MT -&gt; pacs.008 / pacs.009: replaced SettlementMethod INGA with INDA when 53a\Party Identifier is an account starting with /C (i.e., /C1234567) and only keep INGA for cases where the identifier is /C/<account></li>
+<li>CBPR+ camt.105 -&gt; MTn90 - camt.106 -&gt; MTn91: replaced mapping from MessageNameIdentification with MessageIdentification into field 21</li>
+<li>CBPR+ camt.105 -&gt; MTn90 - camt.106 -&gt; MTn91: replaced mapping to field 32C with 32D and fixed mapping from DebtorAgent into 52A/52D</li>
+<li>CBPR+ camt.105 -&gt; MTn90 - camt.106 -&gt; MTn91: added extra information in field 71B (details of charges)</li>
+<li>CBPR+ pain.001 -&gt; MT101: change mapping order in MT101 fields and minor fixes to comply with the latest CBPR+ guidelines</li>
+<li>camt.108.001.01 -&gt; MT111 - camt.109.001.01 -&gt; MT112: revamped mapping for fields 75 and 76 using MXtoMt75CANC and MXtoMt76CANC functions</li>
+<li>MT to MX translators: fixed mapping from 50F/59F into Debtor/Creditor PostalAddress (hybrid address) when line 3/ with LEIC exists in MT source </li>
+<li>CBPR+ camt.029.001.09 -&gt; MT196/MT296: removed initial two characters when mapping OriginalMessageNameIdentification into field 11R (i.e., MT103 -&gt; 103)</li>
+<li>CBPR+ camt.108.001.01 -&gt; MT111: fixed mapping from ChequeCancellationOrStopReason into narrative 75 (restricted 6*35x)</li>
+<li>CBPR+ camt.109.001.01 -&gt; MT112: fixed mapping from ChequeCancellationOrStopStatus into narrative 76 (restricted 6*35x)</li>
+<li>CBPR+ camt.052.001.08 -&gt; MT942: enhanced mapping from Report\Entry into field 61</li>
+<li>CBPR+ camt.057.001.06 -&gt; MT210: removed NOTPROVIDED case when Notification\Account in not present for mapping field 25</li>
+<li>CBPR+ pain.001.001.09 -&gt; MT101: fixed mapping from InitiatingParty into 50C or 50L</li>
+</ul>
 <h4 id="961-june-2025">9.6.1 - June 2025</h4>
 <ul>
 <li>(PW-2529) MT202 -&gt; pacs.009.001.*: fixed mapping from field 72 into RemittanceInformation/Unstructured when codeword text starts with a character followed by a slash (/BNF/A/C)</li>
