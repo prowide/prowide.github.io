@@ -760,6 +760,19 @@
     Persistence - Lightweight Layer
   </a>
   
+    <nav class="md-nav" aria-label="Persistence - Lightweight Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#uetr-extraction" class="md-nav__link">
+    UETR Extraction
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2157,6 +2170,19 @@
     Persistence - Lightweight Layer
   </a>
   
+    <nav class="md-nav" aria-label="Persistence - Lightweight Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#uetr-extraction" class="md-nav__link">
+    UETR Extraction
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2216,6 +2242,15 @@ database structure. It can be thought of as a wrapper of a swift message file.</
 <p>Besides message content, the model provides several metadata containers very useful for a message management application, 
 such as a holder for message status, attached notes and extendable properties.</p>
 <p>The main classes for this layer are the <code>AbstractSwiftMessage</code> and <code>MtSwiftMessage</code>.</p>
+<h3 id="uetr-extraction">UETR Extraction</h3>
+<p>The <code>MtSwiftMessage</code> class automatically extracts the UETR (Unique End-to-End Transaction Reference) from block 3
+field 121 when parsing a message. The UETR is a UUID that uniquely identifies a payment transaction across the
+SWIFT network.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">MtSwiftMessage</span><span class="w"> </span><span class="n">mt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MtSwiftMessage</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="n">fin</span><span class="p">);</span><span class="w"></span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">String</span><span class="w"> </span><span class="n">uetr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mt</span><span class="p">.</span><span class="na">getUetr</span><span class="p">();</span><span class="w">  </span><span class="c1">// Returns the UETR if present, null otherwise</span><span class="w"></span>
+</code></pre></div>
+<p>This extraction is performed automatically during message parsing, making the UETR readily available for persistence
+and querying without additional processing.</p>
 <h2 id="parsebuild-functional-layer">Parse/Build - Functional Layer</h2>
 <p>The middle layer is a functional view of a specific message, for example an <code>MT103</code>. The provided API allows you to read 
 data from a known message easily, as well as API to build new messages.</p>
@@ -2234,7 +2269,7 @@ narrative content in a structured way. </p>
 Where the codewords are separated with slashes and can be used to categorize part of the narrative content.</p>
 <p>The internal component structure for these fields is just a plain single String with the whole value. 
 But the structured content can be retrieve using:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="w">  </span><span class="n">Narrative</span><span class="w"> </span><span class="n">narrative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="na">narrative</span><span class="p">();</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">  </span><span class="n">Narrative</span><span class="w"> </span><span class="n">narrative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="na">narrative</span><span class="p">();</span><span class="w"></span>
 </code></pre></div>
 <p>Where the <code>Narrative</code> object provides methods to access the different parts of the narrative by the codewords.</p>
 <p>The <code>NarrativeResolver</code> parser can automatically detect the narrative structure and create the <code>Narrative</code> depending
