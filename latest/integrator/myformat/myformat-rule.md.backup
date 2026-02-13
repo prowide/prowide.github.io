@@ -1,0 +1,929 @@
+# Mapping Rule
+
+A mapping rule defines how a portion of content from the source message is transformed and appended into the target
+message. Therefore, a conversion from a source message into a target message is composed of a list of **mapping rules**.
+
+The mapping rules can be defined programmatically or by providing a configuration file. The configuration file could be
+a simple Excel spreadsheet with the mappings.
+
+The general structure of a mapping rule contains the following elements:
+
+* **Source**: The source is used to identify which field in the source message must be read. It is indicated as a
+  selector
+  expression with a syntax corresponding to the source message format. For an MT it could be a field within a sequence,
+  for an XML it is an XPath, and for a Fixed-length it can be a field within a specific record type.
+
+
+* **Transformation**: Transformations are optional and allows changing the read value before appending it into the
+ target message. If no transformation is defined for a rule, the found source content is copied into the target message 
+ unchanged. Transformations are defined as functions, and a mapping rule can define several functions that will be
+ applied one after the other. An out-of-the-box dictionary of transformation is provided and custom transformation can 
+aso be added as plugins, for example to do lookup to external sources. See the [Transformations](myformat-transformations.md) section
+ for a comprehensive list of available transformation functions.
+
+* **Target**: The target selector is used to identify where in the target message to read and optionally transformed
+  content will be set.
+
+
+* **Read Mode**: The read mode is optional, and it is used to define how to read and process content from the source
+  message. The supported modes are:<br>
+
+    * **Single**: This is the default mode, it reads a single value from the source message, regardless of the content
+      being repetitive or not.<br>
+    * **Foreach**: Reads multiple repetitive values from the source content and process them in a loop. The same mapping
+      rule is applied for each read value. The foreach can receive one or two selectors. When two selectors are
+      received, the first one is used to compute
+      the repetitions, while the second one is used to get the actual value for the translation. This is particularly
+      useful when you need to get a general content from the source message and copy the same value to multiple
+      repetitive instances in the target message.<br>
+    * **Literal**: Instead of providing a content selector, this mode is used to have a fixed value directly in the
+      rule. Literal are defined as literal(foo) and also as quoted text with just "foo".
+    * **Concat**: Receives multiple selectors, and concatenates all read content into a single value. This selector will
+      concatenate the values of the fields indicated in the parameters. It also allows quoted literals as parameters.
+      A typical use case is to combine values from the source message along a fixed separator. For example when reading
+      content from an MT you can have as selector something like CONCAT(20, "|", 21, "|", 59/1) which will generate as
+      value the concatenation of the field 20, a pipe, the field 21, another pipe and the account number from field 59.
+    * **Foreach_Concat**: Iterates over multiple repeating elements and concatenates their values into a single string
+      with a specified separator. Unlike FOREACH which creates multiple target elements, FOREACH_CONCAT produces one
+      aggregated string. Syntax: `FOREACH_CONCAT(selector, separator)` or `FOREACH_CONCAT(selector, separator, includeNulls)`.
+      See the [FOREACH_CONCAT](#foreach_concat) section for details and examples.
+
+* **Write Mode**: Finally, the write mode is optional, and it is used to define what to do when the content already
+  exists in the target message, for example, create, overwrite or append.
+
+    * **Create**: This is the default mode. A new element or field will always be created in the target message,
+      regardless if the
+      element already exists.<br>
+    * **Update**: Checks if the target element or field exists before creating a new one. If the element is found, its
+      value is
+      overwritten with the new value from the rule. If the target element does not exist, this mode is similar to
+      Create.<br>
+    * **Append**: Checks if the target element exists before creating a new one. If the element is found, its value will
+      be kept
+      and the new value from the rule will be appended. If the target element does not exist, this mode is similar to
+      Create.
+    * **Setup**: Used in some file formats, such as fixed-length, to initialize the output like an empty template, or
+      define configuration options for the output message (encoding, namespace, etc…). There are some setup command
+      to define also general attributes of the mapping table, such as the specific source and target format and type.
+      See the [Setup Commands](myformat-setup-commands.md) section for details on available setup commands.<br>
+    * **Variable**: Stores the result value in a runtime variable instead of writing to the target message. The target
+      must be a variable name prefixed with $ (e.g., $myVar). Variables can be referenced in subsequent rules using
+      the same $varName syntax in source selectors or CONCAT expressions. Variables are scoped to a single translation
+      call and allow extracting and transforming values once, then reusing them in multiple places without repetition.
+      See the [Runtime Variables](#runtime-variables) section for details.<br>
+
+This simple but flexible scheme allows almost all message conversion scenarios.
+
+## Generic Examples
+
+The following tables illustrate different combinations of parameters for a mapping rule, regardless of the message
+format. A complete translation between a source and a target message is done with a table containing a list of mapping
+rules.
+
+**Example 1** - Simple Mapping
+
+| Source       | Transformations      | Target           | Write Mode      |
+|--------------|----------------------|------------------|-----------------|
+| Selector 1   |                      | Selector 2       |                 |
+
+Reads the content located at **Selector 1** in the source message, and writes the read value, at the position indicated
+by **Selector 2** in the target message. A single value is read. The read value is propagated as is, without
+transformations. The write mode is not specified, so a new element is created in the target message.
+
+**Example 2** - Transformation
+
+| Source       | Transformations                           | Target           | Write Mode          |
+|--------------|-------------------------------------------|------------------|---------------------|
+| Selector 1   | Transformation 1                          | Selector 2       |                     |
+
+Reads content indicated by **Selector 1**, applies a transformation **Transformation 1**, and writes the manipulated
+content in
+**Selector 2** in the target message.
+
+**Example 3** - Multiple Transformations
+
+| Source       | Transformations                                              | Targ   et  | Write Mode  |
+|--------------|--------------------------------------------------------------|------------|-------------|
+| Selector 1   | Transformation 1,<br> Transformation 2,<br> Transformation 3 | Selector 2 |             |
+
+Reads content indicated by **Selector 1**, applies the three transformations 1, 2, and 3, and writes the manipulated
+content
+in **Selector 2** in the target message. The transformations are processed in a **pipeline**, where the output of one
+transformation becomes the input for the next transformation.
+
+**Example 4** - Write Mode
+
+| Source     | Transformations  | Target     | Write Mode  |
+|------------|------------------|------------|-------------|
+| Selector 1 | Transformation 1 | Selector 2 | Append      |
+
+Reads content indicated by **Selector 1**, applies the transformations Transformation 1, and writes the manipulated
+content in **Selector 2** in the target message. If the element indicated by **Selector 2** does not exist in the target
+message, it will be created. If the element exists, the processed value is **appended** to the existing content of the
+existing element.
+
+**Example 5** - Literal
+
+| Source       | Transformations   | Target     | Write Mode  |
+|--------------|-------------------|------------|-------------|
+| Literal(foo) |                   | Selector 2 |             |
+
+In this example, instead of providing a selector for the source message, we provide a literal content "foo". The value
+"foo" is then written in **Selector 2** in the target message.
+
+**Example 6** - Multiple Sources
+
+| Source                              | Transformations   | Target     | Write Mode  |
+|-------------------------------------|-------------------|------------|-------------|
+| Concat(Selector 1,<br> Selector 1') |                   | Selector 2 |             |
+
+In this example, we provide two selectors for the source message. Combined with a **Concat** read mode. The
+concatenation of
+both read values is then passed through the translation and written in **Selector 2** in the target message.
+
+**Example 7** - Foreach with single selector
+
+| Source              | Transformations   | Target     | Write Mode  |
+|---------------------|-------------------|------------|-------------|
+| Foreach(Selector 1) | Transformation 1  | Selector 2 |             |
+
+Reads multiple values from the source message at the location indicated by **Selector 1**. Each read value is passed
+through
+Transformation 1 and written in the target message at the location indicated by **Selector 2**.
+
+**Example 8** - Foreach with double selector
+
+| Source                           | Transformations   | Target     | Write Mode  |
+|----------------------------------|-------------------|------------|-------------|
+| Foreach(Selector 1, Selector 1') | Transformation 1  | Selector 2 |             |
+
+Reads multiple values from the source message at the location indicated by the combination of **Selector 1** (used to iterate the loop)
+and **Selector 1'** (used to get the actual value).
+Each read value is passed through Transformation 1 and written in the target message at the location indicated 
+by **Selector 2**.
+
+Note that when reading from Mt (ie. using MtReader) there are some scenarios where the **Selector 1'** is set to 
+get values from optional fields. In this case it is possible to obtain  **null** values as results if the Field is absent.
+
+This will result in a list of values with some null values in it. 
+To avoid this behavior and get a list of not null values there is a special property that can be set in the MtReader 
+that will avoid adding null values to the result list. This property is true by default.
+    
+```java
+    MtReader reader = new MtReader(mt);
+    reader.setAllowReadManyWithValueSelectorNullItems(false);
+```
+
+## Selectors
+
+The selectors are a key feature in a mapping rule. A selector is a plain String defining a precise element or field in a
+message. The selector expressions are used in a mapping rule to indicate what content from the source message is read,
+or where in the target message the content is going to be written.
+
+The syntax of the selector depends on the file format. Please refer to the specific section for a file format to see the
+grammar of the selector.
+
+We provide here a few simple examples to illustrate the versatility of the selectors and how they are used to getting
+content from different types of file.
+
+| Format       | Selector                            | Description                                                                                                       |
+|--------------|-------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| MT           | **E/E1/95Q**                        | selects the field 95Q in subsequence E1 within sequence E                                                         |
+| MT           | **59/Line[2]**                      | selects the second line of component 59, with the name & address information                                      |
+| MX           | **/Document/SttlmInstrDtls/DtTm**   | selects the value of the element DtTm                                                                             |
+| MX           | **/Document/PmtDtls/SttlmAmt/@Ccy** | selects the value of the attribute Ccy in the element SttlmAmt                                                    |
+| XML          | **/A/B[3]/C**                       | Selects the value of element C in the third child B in the root node A                                            |
+| JSON         | **X.Y[2].Z**                        | Selects the value of element Z in the second sub-element of the array Y in the element X                          |
+| CSV          | **3**                               | Select the third column in a CSV row                                                                              |
+| CSV          | **5[ &#60;1='DTL'&#62; ]**          | Selects the fifth column from a CSV line, where column 1 contains "DTL"                                           |
+| FIXED-LENGTH | **3..7[ &#60;ROW=1\&#62; ]**        | Selects the value in the positions 3 to 7 in the first row                                                        |
+| FIXED-LENGTH | **3/5[ &#60;1/3='DTL'&#62; ]**      | Selects the value in the position 3 to 7 from a line where position 1 to 3 contain the record identified by "DTL" |
+
+
+## Conditionals
+
+The mapping rules do not support conditional logic and conditional operators. However, a **special semantic implemented
+for null** values can overcome this limitation in most situations. There are two ways to produce a null value:
+
+* With a selector that finds no result: if a Source selector does not produce any result applied to the source message,
+  for example if the element is optional in the source message, then the mapping rule will be skipped. Meaning, it will
+  not create empty content in the target message. This is useful to deal with optional content in the source message,
+  you can just add the mapping for the optional content and if it is not present, the rule will be silently ignored.
+* With a transformation: When the content in the source message is present, you can apply one or many transformations
+  that in some scenarios will produce a null. In particular, you can use the **stripToNull** transformation.
+
+Besides the above simple approaches, there are two power functions especially suited to achieve more complex conditional
+logic: **IfMatches** and **IfNotMatches**. Both functions accept a regex as input and will let the content pass through if
+they match or not match the regex.
+
+**Example 1:**
+
+For example, if you want to achieve this type of simple conditional logic:
+
+```sql
+    IF (Selector A = "C")
+    THEN "UNIT" -> Selector B
+    ELSE "FAMT" -> Selector B
+```
+
+Where basically if the source selector has a "C" you will write the literal "UNIT" in the target, otherwise you will
+write "FAMT".
+
+The above can be resolved with the ifElse transformation like this:
+
+| Source | Transformations                      | Target |
+|------------------------------------|--------------------------------------|------------|
+| Selector A | **ifElse("C", "UNIT", "FAMT")**       | Selector B |
+
+
+You can achieve the same with the **ifMatches** and **ifNotMatches** transformation, using two mapping rules, one to catch the 
+IF and another to catch the ELSE:
+
+| Source | Transformations | Target |
+|------------------------------------|-----------------------------------|------------|
+| Selector A | **ifMatches("C"); fixed("UNIT")** | Selector B |
+| Selector A | **ifNotMatches("C"); fixed("FAMT")** | Selector B |
+
+In the first rule when the source content is a "C" the **IfMatches** will match and thus propagate that "C" literal as
+value. Then instead of using the literal, we use a fixed transformation to write something else in the target. IN this
+same rule when the source content is not the "C" literal, the **IfMatches** will not match, thus it will return null and no
+further transformation is evaluated, and no content is written to the output.
+
+The second rule will do the opposite, it will propagate content and write the fixed value only when the input did not
+match.
+
+**Example 2:**
+
+For example, if you want to achieve this more complex type of conditional logic:
+
+```sql
+    IF (Selector 1 = CANC or Selector 1 = AMD)
+    THEN Selector 2 -> Selector A
+    ELSE Selector 3-> Selector B
+```
+
+You have three different source selectors. The "Selector 1" is used for the conditional logic check, then depending on
+that you will propagate to the output the content from two other different selectors "Selector 2" and "Selector 3"
+conditionally.
+
+The above is mapped like this:
+
+| Source | Transformations                                                                                        | Target |
+|------------------------------------|--------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| Concat(Selector 1, ";", Selector 2, ";", Selector 3) | **ifMatches(‘^(CANC&#124;AMND);.+;’),<br> removeFirst(‘^(CANC&#124;AMND);’),<br> removeFirst(‘;.\*$’)** | Selector A |
+| Concat(Selector 1, ";", Selector 2, ";", Selector 3) | **ifNotMatches(‘^(CANC&#124;AMND);.+’),<br>removeFirst(‘^.+;')**                                       | Selector B |
+
+The source selector is a concatenation of the actual selectors, separated by a semicolon. So the source content
+selection
+will produce a semicolon separated string. Then the transformation will pass through the content of Selectors 2 or
+Selector 3 depending on the content of Selector 1.
+
+Then, the second rule will do the same, passing through the content of selector 3.
+
+Note that the transformation **ifMatches**, **ifNotMatches** can be replaced by **ifElse** when the **Target** selector is the same.
+If a different **Target** is going to be selected based on the input, then you need to use the **ifMatches** and **ifNotMatches** transformation.
+
+
+Let's check an actual example based on transformation above:
+
+* Selector 1 = CANC
+* Selector 2 = XXX
+* Selector 3 = YYY
+
+Given those values and the **Concat** function, the **Source** value that the **Transfomations** receive will be `CANC;XXX;YYY`.
+
+Then the transformations will result like this:
+
+For the first row, and the first transformation `ifMatches(‘^(CANC|AMND);.+;’)`, it will be evaluated as true since the input starts with ´CANC;XXX;´.
+The output from **transformation 1** to **transformation 2**, will be the same as the input one (it will be `null` if the input is evaluated as false).
+
+For the first row, and the second transformation `removeFirst(‘^(CANC|AMND);’)`, this will remove the substring `CANC;`.
+The output from **Transformation 2** to **Transformation 3** will be `XXX;YYY`.
+
+For the first row, and the third transformation `removeFirst(‘;.*$’)`, this will remove the substring that is the suffix to the first `;` char, that'll be `;YYY`.
+The output from **Transformation 3** to **Target** (in this case Selector A) will be `XXX`. Note that this is the value from `Selector 2`.
+
+In this case since the second row transformation doesn't match the input value, so it will produce a `null` value as a result, and the rest of the transformation will not be applied.
+
+Let's check another example, that matches the second row from transformation above:
+
+This case will produce `null` as a result for first row and will perform the transformation for the second one.
+
+* Selector 1 = AAA
+* Selector 2 = XXX
+* Selector 3 = YYY
+
+Given those values and the **Concat** function, the **Source** value that the **Transfomations** receive will be `AAA;XXX;YYY`.
+
+Then the transformations will result like this:
+
+For the second row, and the first transformation `ifNotMatches(‘^(CANC|AMND);.+’)`, it will be evaluated to true since the input starts with `AAA;` that doesn't match the regex expression `^(CANC|AMND);.+`.
+The output from **Transformation 1** to **Transformation 2**, will be the same as the input one.
+
+For the second row, and the second transformation `removeFirst(‘^.+;’)`, this will remove the substring that is the prefix to the last `;` char.
+The output from **Transformation 2** to **Target** (in this case Selector A) will be `YYY`. Note that this is the value from `Selector 3`.
+
+Please this two code examples that are equivalent to what's described above.
+
+**Example 1**
+
+```java
+// IF (Selector 1 = CANC or Selector 1 = AMD)
+// THEN Selector 2 -> Selector A (Target)
+// ELSE Selector 3-> Selector B
+
+String selector1 = "CANC";
+String selector2 = "CLREL";
+String selector3 = "ORIGREL";
+String selectorInput = selector1 + ";" + selector2 + ";" + selector3;
+
+Transformation tNotMatching = new Transformation(Key.ifNotMatches, "^(CANC|AMND);.+");
+assertNull(tNotMatching.transform(selectorInput));
+
+Transformation t1 = new Transformation(Key.ifMatches, "^(CANC|AMND);.+;");
+String t1Result = t1.transform(selectorInput);
+assertEquals(selectorInput, t1Result);
+
+Transformation t2 = new Transformation(Key.removeFirst, "^(CANC|AMND);");
+String t2Result = t2.transform(t1Result);
+assertEquals("CLREL;ORIGREL", t2Result);
+
+Transformation t3 = new Transformation(Key.removeFirst, ";.*$");
+String t3Result = t3.transform(t2Result);
+assertEquals(selector2, t3Result);
+
+// selector2 to Selector A (Target)
+```
+
+**Example 2**
+
+```java
+// IF (Selector 1 = CANC or Selector 1 = AMD)
+// THEN Selector 2 -> Selector A
+// ELSE Selector 3-> Selector B (Target)
+
+String selector1 = "AAA";
+String selector2 = "CLREL";
+String selector3 = "ORIGREL";
+String selectorInput = selector1 + ";" + selector2 + ";" + selector3;
+
+Transformation tNotMatching = new Transformation(Key.ifMatches, "^(CANC|AMND);.+;");
+assertNull(tNotMatching.transform(selectorInput));
+
+Transformation t1 = new Transformation(Key.ifNotMatches, "^(CANC|AMND);.+");
+String t1Result = t1.transform(selectorInput);
+assertEquals(selectorInput, t1Result);
+
+Transformation t2 = new Transformation(Key.removeFirst, "^.+;");
+String t2Result = t2.transform(t1Result);
+assertEquals(selector3, t2Result);
+
+// selector3 to Selector B (Target)
+```
+
+## Custom Transformations
+
+When the out-of-the-box transformations are not enough, custom functions can be added by implementing the `Transformer`
+interface in your own class.
+
+```java
+    class CustomTransformer implements Transformer {
+
+    @Override
+    public String transform(String src, Object[] args) {
+        return StringUtils.upperCase(src);
+    }
+
+    @Override
+    public String getTransformerName() { return "myTransformer"; }
+
+    @Override
+    public boolean isValid(Object[] args) { return true; }
+}
+```
+
+The example above implements a simple uppercase transformation.
+
+* The **transform** method is where the custom manipulation is implemented, the method receives the input to transform
+  and optionally some parameters, and returns the altered content.
+* The **getTransformerName** is used to provide a unique name to the function so that it can be referenced in the
+  mapping configuration.
+* The **isValid** method is optional, to validate for example if the provided arguments are valid.
+
+If the mapping configuration is done programmatically, then the custom transformer class can be used directly in the
+code when the `MappingRule` objects are created.
+
+If the mapping configuration is externalized, for example, loaded from an Excel sheet, then the custom transformer must
+be registered so that the name is recognized when parsing the configuration. In order to register your custom
+transformer, you just need to call this anywhere in your initialization.
+
+```java
+    TransformationRegistry.register("myTransformer",new CustomTransformer());
+```
+
+Then, in your mapping configuration, you can use "myTransformer" along any of the out-of-the-box transformations
+functions.
+
+![Custom Transformer](../../assets/images/CustomTransformer.png)
+
+## Runtime Variables
+
+Runtime variables provide a mechanism to store intermediate values during translation and reuse them across multiple
+mapping rules. Variables are defined using `WriteMode.VARIABLE` and referenced with the `$` prefix.
+
+**Key characteristics:**
+
+* **Scope**: Variables exist only during a single `translate()` call
+* **Syntax**: Variable names must start with `$` (e.g., `$myVar`, `$amount`, `$reference`)
+* **Definition**: Use `WriteMode.VARIABLE` with a variable name as target to define variables
+* **Usage**: Variables can be used in source selectors, CONCAT expressions, and transformation parameters
+* **Order**: Variables must be defined before use (validated at compile time)
+* **Read Modes**: Variables work with all read modes:
+  - LITERAL, SINGLE, CONCAT: Variables supported in source and transformation parameters
+  - FOREACH, FOREACH_CONCAT: Variables supported in transformation parameters only (not in selectors)
+
+**Common use cases:**
+
+* **Reuse transformed values**: Extract once, transform once, use multiple times to avoid repeating expensive operations
+* **Build complex identifiers**: Construct reference numbers from multiple parts and format them differently for various outputs
+* **Multi-step transformations**: Parse data once, then format differently for multiple target fields
+* **Avoid selector repetition**: Store deeply nested or complex paths once, reference cleanly multiple times
+* **Store conditional results**: Extract multiple values and combine them in different contexts
+
+**Example - Reusing a transformed amount:**
+
+```java
+MappingTable table = new MappingTable(FileFormat.MT, FileFormat.MX);
+
+// Extract and format amount once
+table.add(new MappingRule("32A/Amount", "$formattedAmount", WriteMode.VARIABLE,
+    new Transformation(Key.formatDecimal, "0.00")));
+
+// Use in multiple places
+table.add(new MappingRule("$formattedAmount", "/Document/TtlIntrBkSttlmAmt"));
+table.add(new MappingRule("CONCAT(\"USD \", $formattedAmount)", "/Document/Summary"));
+table.add(new MappingRule("$formattedAmount", "/Document/ChargedAmount",
+    new Transformation(Key.multiply, "1.02"))); // Add 2% markup
+```
+
+**Example - Building complex identifiers:**
+
+```java
+// Extract components
+table.add(new MappingRule("20C/SEME", "$senderRef", WriteMode.VARIABLE));
+table.add(new MappingRule("21/RelatedRef", "$relatedRef", WriteMode.VARIABLE));
+table.add(new MappingRule("LITERAL(\"2025\")", "$year", WriteMode.VARIABLE));
+
+// Combine in different formats
+table.add(new MappingRule("CONCAT($year, \"-\", $senderRef, \"-\", $relatedRef)",
+    "/Document/InternalReference"));
+table.add(new MappingRule("CONCAT($senderRef, \"/\", $year)", "/Document/ExternalReference"));
+```
+
+**Variables in transformation parameters:**
+
+Runtime variables can be used in transformation parameters. This enables dynamic transformation
+behavior based on previously extracted values.
+
+**Example 1: Dynamic string replacement**
+
+Replace a placeholder in a template with a value extracted from another field:
+
+```java
+MappingTable table = new MappingTable(FileFormat.MT, FileFormat.CSV);
+
+// Extract the account number to use as replacement
+table.add(new MappingRule("59/Account", "$accountNumber", WriteMode.VARIABLE));
+
+// Replace placeholder in a template field with the account number
+MappingRule rule = new MappingRule("72/Narrative", "1");
+rule.addTransformation(new Transformation(Key.replace, "{ACCOUNT}", "$accountNumber"));
+table.add(rule);
+
+// Input:  72: "Transfer to account {ACCOUNT} completed"
+// Output: "Transfer to account 123456789 completed"
+```
+
+**Example 2: Dynamic prefix from source message**
+
+Format amounts with the currency extracted from the same message:
+
+```java
+MappingTable table = new MappingTable(FileFormat.MT, FileFormat.CSV);
+
+// Extract currency from field 32A
+table.add(new MappingRule("32A/Currency", "$ccy", WriteMode.VARIABLE));
+
+// Format amount with currency prefix
+MappingRule amountRule = new MappingRule("32A/Amount", "0");
+amountRule.addTransformation(new Transformation(Key.prepend, "$ccy "));
+table.add(amountRule);
+
+// Input MT:  :32A:230101USD1000,00
+// Output CSV: USD 1000,00
+```
+
+**Example 3: Conditional default values**
+
+Use a value from one field as the default for another:
+
+```java
+MappingTable table = new MappingTable(FileFormat.MT, FileFormat.MX);
+
+// Store sender BIC as fallback
+table.add(new MappingRule("SENDER", "$senderBic", WriteMode.VARIABLE));
+
+// Use sender as default if field 52A is missing
+MappingRule rule = new MappingRule("52A/BIC", "/Document/OrderingAgent/BIC");
+rule.addTransformation(new Transformation(Key.defaultString, "$senderBic"));
+table.add(rule);
+
+// If 52A is present:  uses 52A value
+// If 52A is missing:  uses sender BIC from block 1
+```
+
+**Example 4: Extract content between dynamic delimiters**
+
+Extract text between delimiters that vary by message type:
+
+```java
+MappingTable table = new MappingTable(FileFormat.MT, FileFormat.CSV);
+
+// Define delimiters (could come from configuration or message content)
+table.add(new MappingRule("LITERAL(\"[\")", "$open", WriteMode.VARIABLE));
+table.add(new MappingRule("LITERAL(\"]\")", "$close", WriteMode.VARIABLE));
+
+// Extract reference between brackets
+MappingRule rule = new MappingRule("20/Reference", "0");
+rule.addTransformation(new Transformation(Key.substringBetween, "$open", "$close"));
+table.add(rule);
+
+// Input:  :20:[REF123]
+// Output: REF123
+```
+
+**Example 5: Dynamic padding character**
+
+Pad values with a character defined elsewhere:
+
+```java
+MappingTable table = new MappingTable(FileFormat.CSV, FileFormat.MT);
+
+// Define padding character from configuration
+table.add(new MappingRule("LITERAL(\"0\")", "$padChar", WriteMode.VARIABLE));
+
+// Left-pad account number to 10 digits
+MappingRule rule = new MappingRule("0", "58A/Account");
+rule.addTransformation(new Transformation(Key.leftPad, 10, "$padChar"));
+table.add(rule);
+
+// Input:  12345
+// Output: 0000012345
+```
+
+**Supported transformations with variable parameters:**
+
+Variables can be used in any String parameter of transformations, including:
+
+* `prepend($prefix)`, `append($suffix)`
+* `replace($search, $replacement)`
+* `substringBetween($open, $close)`
+* `defaultString($default)`
+* `map($key, $value)`
+* `ifElse($condition, $then, $else)`
+* `ifMatches($pattern)`, `ifNotMatches($pattern)`
+* `leftPad(size, $padChar)`, `rightPad(size, $padChar)`
+* And all other transformations accepting String parameters
+
+Note: Integer parameters (like `size` in `leftPad`) cannot be replaced with variables.
+
+**Example 5: Variables in FOREACH transformations**
+
+Apply dynamic transformations to each element in a FOREACH iteration:
+
+```java
+MappingTable table = new MappingTable(FileFormat.XML, FileFormat.XML);
+
+// Extract prefix from message header
+table.add(new MappingRule("/msg/header/code", "$prefix", WriteMode.VARIABLE));
+
+// Apply dynamic prefix to each item during FOREACH iteration
+MappingRule rule = new MappingRule("FOREACH(/msg/items/item)", "/output/processed/item");
+rule.addTransformation(new Transformation(Key.prepend, "[$prefix] "));
+table.add(rule);
+
+// Input XML:  <msg><header><code>TYPE-A</code></header><items><item>X</item><item>Y</item><item>Z</item></items></msg>
+// Output XML: <output><processed><item>[TYPE-A] X</item><item>[TYPE-A] Y</item><item>[TYPE-A] Z</item></processed></output>
+```
+
+**Limitations:**
+
+* **FOREACH/FOREACH_CONCAT selectors**: Variables cannot be used as source selectors in FOREACH or FOREACH_CONCAT
+  rules. A static variable value feeding a dynamic read operation doesn't make sense conceptually.
+  Use literal selector paths instead.
+* **Embedded variables in source selectors**: Variables cannot be embedded within source selector strings.
+  Use CONCAT instead: `CONCAT("prefix_", $var, "_suffix")`.
+* **Embedded variables in transformation args**: Variables CAN be embedded in transformation parameters.
+  For example, `prepend("prefix:$var:suffix")` will resolve `$var` to its value at runtime.
+  **Important**: Use separators like `:`, `/`, or spaces to delimit embedded variables. Characters `_` and `-`
+  are considered part of the variable name, so `"prefix_$var_suffix"` is parsed as variable `$var_suffix`, not `$var`.
+
+**Validation:** The validator checks that:
+
+* Variable targets start with `$` and names are not empty
+* Variables are defined before use in source selectors
+* Variables are defined before use in transformation parameters
+
+Clear error messages indicate the rule number, transformation name, and variable name for any issues. For example:
+
+```
+Rule 3: transformation 'prepend' uses undefined variable '$prefix'. Variables must be defined with WriteMode.VARIABLE before use.
+```
+
+This compile-time validation catches typos and ordering issues before runtime, preventing silent failures where undefined variables would remain as literal `$varName` text in the output.
+
+## FOREACH_CONCAT
+
+FOREACH_CONCAT is a read mode that iterates over multiple repeating elements and concatenates their values into a single string. This is useful when you need to aggregate repetitive data from the source message into a single field in the target.
+
+**Syntax:**
+
+```
+FOREACH_CONCAT(selector, separator)
+FOREACH_CONCAT(selector, separator, includeNulls)
+```
+
+**Parameters:**
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `selector` | Yes | Path to the repeating elements to aggregate |
+| `separator` | Yes | String to insert between values (quoted) |
+| `includeNulls` | No | `true` or `false` (default: `false`). When `true`, null values appear as empty strings in the result |
+
+**Key characteristics:**
+
+* **Single output**: All matched values are combined into one string
+* **Order preserved**: Values appear in document order
+* **Transformations**: Applied to the final concatenated result, not individual values
+* **Variable support**: Result can be stored in a variable with `WriteMode.VARIABLE`
+* **Validation**: Parameters are validated at compile time
+
+**Example 1: Basic aggregation from XML**
+
+Concatenate all item names from a repeating XML element:
+
+```java
+MappingTable table = new MappingTable(FileFormat.XML, FileFormat.CSV);
+
+table.add(new MappingRule("FOREACH_CONCAT(/order/items/item, \"|\")", "0"));
+
+// Input XML:
+// <order>
+//   <items>
+//     <item>Widget</item>
+//     <item>Gadget</item>
+//     <item>Tool</item>
+//   </items>
+// </order>
+
+// Output CSV: Widget|Gadget|Tool
+```
+
+**Example 2: Store aggregation in variable for reuse**
+
+Aggregate values once and use them multiple times:
+
+```java
+MappingTable table = new MappingTable(FileFormat.XML, FileFormat.CSV);
+
+// Aggregate into variable
+table.add(new MappingRule("FOREACH_CONCAT(/invoice/lines/line/amount, \"+\")",
+    "$allAmounts", WriteMode.VARIABLE));
+
+// Use in multiple places
+table.add(new MappingRule("$allAmounts", "0"));
+table.add(new MappingRule("CONCAT(\"Total: \", $allAmounts)", "1"));
+
+// Input: <invoice><lines><line><amount>100</amount></line><line><amount>200</amount></line></lines></invoice>
+// Output column 0: 100+200
+// Output column 1: Total: 100+200
+```
+
+**Example 3: Aggregate from ISO 20022 (MX) message**
+
+Extract all entry references from a camt.053 statement:
+
+```java
+MappingTable table = new MappingTable(FileFormat.MX, FileFormat.CSV);
+table.add(new MappingRule("LITERAL(\"camt.053.001.08\")", "mxType", WriteMode.SETUP));
+
+table.add(new MappingRule(
+    "FOREACH_CONCAT(/Document/BkToCstmrStmt/Stmt/Ntry/NtryRef, \", \")", "0"));
+
+// Input MX with entries REF001, REF002, REF003
+// Output: REF001, REF002, REF003
+```
+
+**Example 4: Aggregate from JSON arrays**
+
+Concatenate array elements using the `{n}` index placeholder:
+
+```java
+MappingTable table = new MappingTable(FileFormat.JSON, FileFormat.CSV);
+
+table.add(new MappingRule("FOREACH_CONCAT(order.tags[{n}], \";\")", "$tags", WriteMode.VARIABLE));
+table.add(new MappingRule("CONCAT(\"Tags: \", $tags)", "0"));
+
+// Input JSON: {"order": {"tags": ["urgent", "verified", "processed"]}}
+// Output: Tags: urgent;verified;processed
+```
+
+**Example 5: Apply transformation to aggregated result**
+
+Transform the concatenated string (transformation applies to final result, not individual values):
+
+```java
+MappingTable table = new MappingTable(FileFormat.XML, FileFormat.CSV);
+
+MappingRule rule = new MappingRule("FOREACH_CONCAT(/data/names/name, \", \")", "0");
+rule.addTransformation(new Transformation(Key.upperCase));
+table.add(rule);
+
+// Input: <data><names><name>alice</name><name>bob</name></names></data>
+// Output: ALICE, BOB
+```
+
+**Example 6: Combine multiple aggregations**
+
+Aggregate different sets of values and combine them:
+
+```java
+MappingTable table = new MappingTable(FileFormat.XML, FileFormat.JSON);
+
+// Aggregate codes and values separately
+table.add(new MappingRule("FOREACH_CONCAT(/report/codes/code, \"-\")", "$codes", WriteMode.VARIABLE));
+table.add(new MappingRule("FOREACH_CONCAT(/report/values/val, \"+\")", "$values", WriteMode.VARIABLE));
+
+// Combine in output
+table.add(new MappingRule("$codes", "result.codes"));
+table.add(new MappingRule("$values", "result.values"));
+table.add(new MappingRule("CONCAT($codes, \" => \", $values)", "result.summary"));
+
+// Input: <report><codes><code>A</code><code>B</code></codes><values><val>100</val><val>200</val></values></report>
+// Output JSON:
+// {
+//   "result": {
+//     "codes": "A-B",
+//     "values": "100+200",
+//     "summary": "A-B => 100+200"
+//   }
+// }
+```
+
+**Example 7: Handle null/missing values**
+
+Control how missing values are handled with the `includeNulls` parameter:
+
+```java
+// With includeNulls=false (default): null values are skipped
+table.add(new MappingRule("FOREACH_CONCAT(/data/items/item, \"|\")", "0"));
+// Values [A, null, C] → "A|C"
+
+// With includeNulls=true: null values appear as empty strings
+table.add(new MappingRule("FOREACH_CONCAT(/data/items/item, \"|\", true)", "0"));
+// Values [A, null, C] → "A||C"
+```
+
+**Runtime Variables Support:**
+
+FOREACH_CONCAT supports runtime variables in specific parameters. The following table summarizes what is and
+isn't supported:
+
+| Parameter | Variable Support | Reason |
+|-----------|------------------|--------|
+| **Selector** (1st param) | ❌ Not supported | A static value feeding a dynamic read doesn't make sense |
+| **Separator** (2nd param) | ❌ Not supported | Variables are treated as literal text |
+| **includeNulls** (3rd param) | ❌ Not supported | Must be `true` or `false` literal |
+| **Target** | ✅ Supported | Store result in variable with `WriteMode.VARIABLE` |
+| **Transformations** | ✅ Supported | Variables resolved at runtime in transformation params |
+
+**Variable in selector parameter (NOT SUPPORTED):**
+
+Variables in the selector parameter are NOT resolved. A static variable value feeding a dynamic read operation
+doesn't make sense conceptually - the selector should be a fixed path that determines what data to aggregate:
+
+```java
+MappingTable table = new MappingTable(FileFormat.XML, FileFormat.CSV);
+
+// This does NOT work as expected - variable in selector is treated as literal
+table.add(new MappingRule("LITERAL(\"/data/items/item\")", "$path", WriteMode.VARIABLE));
+table.add(new MappingRule("FOREACH_CONCAT($path, \"|\")", "0"));
+// "$path" is used as literal XPath, finds nothing, result is empty
+
+// Use a literal selector instead:
+table.add(new MappingRule("FOREACH_CONCAT(/data/items/item, \"|\")", "0"));
+// Input XML:  <data><items><item>A</item><item>B</item><item>C</item></items></data>
+// Output CSV: A|B|C
+```
+
+**Variable in separator parameter (NOT SUPPORTED):**
+
+Variables in the separator parameter are treated as literal text and NOT resolved:
+
+```java
+MappingTable table = new MappingTable(FileFormat.XML, FileFormat.CSV);
+
+// This does NOT work as expected
+table.add(new MappingRule("/data/config/sep", "$sep", WriteMode.VARIABLE)); // extracts ";"
+table.add(new MappingRule("FOREACH_CONCAT(/data/items/item, \"$sep\")", "0"));
+// Input XML:  <data><config><sep>;</sep></config><items><item>A</item><item>B</item><item>C</item></items></data>
+// Output CSV: A$sepB$sepC  (literal "$sep", not resolved to ";")
+
+// Use a literal separator instead:
+table.add(new MappingRule("FOREACH_CONCAT(/data/items/item, \";\")", "0"));
+// Output CSV: A;B;C
+```
+
+**Variables in transformation parameters (SUPPORTED):**
+
+Runtime variables can be used in transformation parameters for dynamic behavior. This applies to both
+FOREACH and FOREACH_CONCAT read modes:
+
+```java
+MappingTable table = new MappingTable(FileFormat.XML, FileFormat.CSV);
+
+// Extract prefix from source message
+table.add(new MappingRule("/data/header/type", "$prefix", WriteMode.VARIABLE));
+
+// Use variable in prepend transformation - $prefix is resolved
+MappingRule rule = new MappingRule("FOREACH_CONCAT(/data/items/item, \"|\")", "0");
+rule.addTransformation(new Transformation(Key.prepend, "$prefix: "));
+table.add(rule);
+// Input XML:  <data><header><type>INVOICE</type></header><items><item>A</item><item>B</item><item>C</item></items></data>
+// Output CSV: INVOICE: A|B|C
+
+// Multiple variables in chained transformations:
+table.add(new MappingRule("LITERAL(\">>\")", "$pre", WriteMode.VARIABLE));
+table.add(new MappingRule("LITERAL(\"<<\")", "$suf", WriteMode.VARIABLE));
+MappingRule rule2 = new MappingRule("FOREACH_CONCAT(/data/values/v, \"|\")", "0");
+rule2.addTransformation(new Transformation(Key.prepend, "$pre"));
+rule2.addTransformation(new Transformation(Key.append, "$suf"));
+table.add(rule2);
+// Input XML:  <data><values><v>A</v><v>B</v><v>C</v></values></data>
+// Output CSV: >>A|B|C<<
+
+// Variables can be embedded in transformation strings:
+table.add(new MappingRule("/data/code", "$code", WriteMode.VARIABLE));
+MappingRule rule3 = new MappingRule("FOREACH_CONCAT(/data/items/item, \"|\")", "0");
+rule3.addTransformation(new Transformation(Key.prepend, "[$code] "));
+table.add(rule3);
+// Input XML:  <data><code>ABC</code><items><item>X</item><item>Y</item></items></data>
+// Output CSV: [ABC] X|Y
+```
+
+**Variable in target (SUPPORTED):**
+
+Store the aggregated result in a variable for use in subsequent rules:
+
+```java
+MappingTable table = new MappingTable(FileFormat.XML, FileFormat.CSV);
+
+// Aggregate and store in variable
+table.add(new MappingRule("FOREACH_CONCAT(/data/items/item, \"|\")", "$allItems", WriteMode.VARIABLE));
+// Use the aggregated variable
+table.add(new MappingRule("CONCAT(\"Items: \", $allItems)", "0"));
+
+// Input XML:  <data><items><item>A</item><item>B</item><item>C</item></items></data>
+// Output CSV: Items: A|B|C
+```
+
+**Other Limitations:**
+
+* **Individual element transformations**: Transformations apply to the final concatenated string,
+  not to each individual element before concatenation. If you need per-element transformation with
+  variables, use FOREACH instead (which also supports variables in transformations).
+
+**Validation:** The validator checks that:
+
+* FOREACH_CONCAT has at least 2 parameters (selector and separator)
+* FOREACH_CONCAT has at most 3 parameters
+* The third parameter (if present) is `true` or `false`
+* The selector is valid for the source format
+
+Error messages clearly indicate issues:
+
+```
+Rule 2: FOREACH_CONCAT requires at least 2 parameters: selector and separator
+Rule 5: FOREACH_CONCAT third parameter must be 'true' or 'false', got: 'maybe'
+```
+
+**Comparison with FOREACH:**
+
+| Feature | FOREACH | FOREACH_CONCAT |
+|---------|---------|----------------|
+| Output | Multiple values (one per iteration) | Single concatenated string |
+| Target creation | Creates multiple target elements | Creates one target element |
+| Use with VARIABLE | Not supported | Supported |
+| Transformations | Applied per element | Applied to final string |
+| Use case | Copy repetitions | Aggregate repetitions |
