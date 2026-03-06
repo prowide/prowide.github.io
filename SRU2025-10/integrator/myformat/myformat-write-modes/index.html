@@ -2546,6 +2546,11 @@
 <h2 id="setup-mode">SETUP Mode</h2>
 <p>The SETUP write mode is used to configure the translation engine rather than write to the target message. Setup commands define properties like source/target formats, message types, encoding, and other translation parameters.</p>
 <p><strong>When to use:</strong> At the beginning of your mapping table to configure how the translation should behave.</p>
+<div class="admonition warning">
+<p class="admonition-title">Rule Ordering</p>
+<p>SETUP rules must appear <strong>before</strong> any data rules (CREATE, UPDATE, APPEND). At runtime, the first non-SETUP/non-VARIABLE rule ends the setup phase; any subsequent SETUP rules will be skipped with a warning. The validator detects this ordering issue and reports an error.</p>
+<p><strong>Exception:</strong> <code>VARIABLE</code> rules do not end the setup phase. You can safely interleave VARIABLE and SETUP rules before the first data rule. This is useful for patterns like storing header values as variables and then using them in a FOREACH <code>addRow</code> template.</p>
+</div>
 <div class="admonition info">
 <p class="admonition-title">Setup Commands Documentation</p>
 <p>For a complete list of available setup commands, see <a href="../myformat-setup-commands/">Setup Commands</a>.</p>
@@ -2595,7 +2600,7 @@
 <h3 id="key-characteristics">Key Characteristics</h3>
 <ul>
 <li><strong>Scope</strong>: Variables exist only during a single <code>translate()</code> call</li>
-<li><strong>Syntax</strong>: Variable names must start with <code>$</code> (e.g., <code>$myVar</code>, <code>$amount</code>, <code>$reference</code>)</li>
+<li><strong>Syntax</strong>: Variable names must start with <code>$</code> followed by a letter or underscore (e.g., <code>$myVar</code>, <code>$_temp</code>, <code>$amount</code>). Variable names <strong>cannot start with a digit</strong> (e.g., <code>$1var</code> is invalid). Names like <code>$1</code>, <code>$2</code>, etc. are reserved for regex capture groups in transformations.</li>
 <li><strong>Definition</strong>: Use <code>WriteMode.VARIABLE</code> with a variable name as target</li>
 <li><strong>Usage</strong>: Variables can be used in source selectors, CONCAT expressions, and transformation parameters</li>
 <li><strong>Order</strong>: Variables must be defined before use (validated at compile time)</li>
@@ -2682,11 +2687,16 @@
 <p>The MyFormat validator checks variable usage at compile time:</p>
 <ul>
 <li>Variables must be defined with <code>WriteMode.VARIABLE</code> before use</li>
-<li>Variable names must start with <code>$</code></li>
+<li>Variable names must start with <code>$</code> followed by a letter or underscore (not a digit)</li>
 <li>Variables used in source selectors or transformations must have been defined in earlier rules</li>
+<li>Variables in FOREACH <code>addRow</code> templates must be defined by preceding VARIABLE rules</li>
+<li>Variables in FOREACH/FOREACH_CONCAT node selectors (first parameter) are never resolved and will produce a validation error</li>
 </ul>
-<p>Example validation error:
+<p>Example validation errors:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>Rule 3: transformation &#39;prepend&#39; uses undefined variable &#39;$prefix&#39;. Variables must be defined before use.
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>Rule 4: FOREACH template uses variable &#39;$account&#39; before it is defined. VARIABLE rules must appear before the SETUP addRow that references them.
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>Rule 5: has WriteMode VARIABLE but target &#39;$1temp&#39; has invalid variable name: variable names cannot start with a digit.
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>Rule 6: variable reference in FOREACH node selector &#39;$path&#39;. Variables are not resolved in node selectors.
 </code></pre></div></p>
 <p>This compile-time validation catches typos and ordering issues before runtime, preventing silent failures.</p>
 <h2 id="write-mode-comparison-table">Write Mode Comparison Table</h2>
