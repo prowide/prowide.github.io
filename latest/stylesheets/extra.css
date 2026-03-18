@@ -10,20 +10,16 @@
 }
 
 [data-md-color-scheme="prowide-default"] {
-    --md-primary-fg-color:        #2E4369;
-    --md-primary-fg-color--light: #2E4369;
-    --md-primary-fg-color--dark:  #2E4369;
-    --md-accent-fg-color:        #6EB7CE;
-    --md-accent-fg-color--light: #6EB7CE;
-    --md-accent-fg-color--dark:  #6EB7CE;
+    --md-primary-fg-color:              #2E4369;
+    --md-primary-fg-color--light:       #6EB7CE;
+    --md-primary-fg-color--dark:        #1a2a45;
+    --md-accent-fg-color:               #FF6178;
+    --md-accent-fg-color--transparent:  #FF617814;
 }
 [data-md-color-scheme="slate"] {
-    --md-primary-fg-color:        #6EB7CE;
-    --md-primary-fg-color--light: #6EB7CE;
-    --md-primary-fg-color--dark:  #6EB7CE;
-    --md-accent-fg-color:        #98c4d1;
-    --md-accent-fg-color--light: #98c4d1;
-    --md-accent-fg-color--dark:  #98c4d1;
+    --md-primary-fg-color:              #6EB7CE;
+    --md-accent-fg-color:               #FF6178;
+    --md-accent-fg-color--transparent:  #FF617814;
 }
 
 /* Typography - Barlow for headings */
@@ -64,7 +60,7 @@ h1, .md-typeset h1 {
 }
 
 .md-nav__link--active {
-    color: var(--md-accent-fg-color) !important;
+    color: #6EB7CE !important;
     font-weight: 500;
 }
 
@@ -93,8 +89,8 @@ h1, .md-typeset h1 {
 }
 
 .md-button--primary:hover {
-    background-color: #6EB7CE;
-    border-color: #6EB7CE;
+    background-color: #FF6178;
+    border-color: #FF6178;
 }
 
 /* Subtle shadows */
@@ -108,14 +104,122 @@ h1, .md-typeset h1 {
 
 /* Table styling */
 .md-typeset table:not([class]) th {
-    background-color: #2E4369;
-    color: white;
+    background-color: rgba(110, 183, 206, 0.18);
     font-weight: 500;
+}
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+    background-color: rgba(110, 183, 206, 0.12);
+}
+
+/* Admonition left border - Light Blue accent */
+.md-typeset .admonition,
+.md-typeset details {
+    border-left-color: #6EB7CE !important;
+}
+
+/* Code block left border
+   Note: border must be on .highlight (the wrapper div), not on pre or code.
+   The background is set on the inner <code> element, so a border on <pre>
+   ends up hidden behind it. */
+.md-typeset .highlight {
+    border-left: 3px solid #6EB7CE;
+}
+
+/* Horizontal rules */
+.md-typeset hr {
+    border-color: rgba(110, 183, 206, 0.4);
 }
 
 /* Link hover */
 .md-typeset a:hover {
-    color: #6EB7CE;
+    color: var(--md-accent-fg-color);
+}
+
+/* Nav section dividers - Light Blue tint */
+.md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__container > a.md-nav__link {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(110, 183, 206, 0.4);
+    display: block;
+}
+[data-md-color-scheme="slate"] .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__container > a.md-nav__link {
+    border-bottom: 1px solid rgba(110, 183, 206, 0.25);
+}
+
+/* Indent third-level nav items */
+.md-nav[data-md-level="2"] > .md-nav__list > .md-nav__item {
+    padding-left: 1.2rem;
+}
+
+/* Spacing after collapsed third-level groups */
+.md-nav__item--nested:not(.md-nav__item--active) {
+    margin-bottom: 1rem;
+}
+
+/* Spacing after expanded third-level groups */
+.md-nav__item--nested.md-nav__item--active {
+    margin-bottom: 1.25rem;
+}
+
+/* Full-width tables */
+.md-typeset__scrollwrap {
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+.md-typeset__table {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+.md-typeset table:not([class]) {
+    width: 100% !important;
+    display: table !important;
+    margin: 0 !important;
+}
+.md-typeset .md-typeset__scrollwrap {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+.md-typeset .md-typeset__table {
+    display: block !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Mermaid diagram dark mode adjustments */
+[data-md-color-scheme="slate"] .mermaid {
+    background-color: transparent !important;
+}
+[data-md-color-scheme="slate"] .mermaid .nodeLabel,
+[data-md-color-scheme="slate"] .mermaid .edgeLabel,
+[data-md-color-scheme="slate"] .mermaid .cluster-label,
+[data-md-color-scheme="slate"] .mermaid text,
+[data-md-color-scheme="slate"] .mermaid tspan {
+    fill: #ffffff !important;
+    color: #ffffff !important;
+}
+[data-md-color-scheme="slate"] .mermaid .node rect,
+[data-md-color-scheme="slate"] .mermaid .node circle,
+[data-md-color-scheme="slate"] .mermaid .node ellipse,
+[data-md-color-scheme="slate"] .mermaid .node polygon {
+    fill: #2d2d2d !important;
+    stroke: #888888 !important;
+}
+[data-md-color-scheme="slate"] .mermaid .cluster rect {
+    fill: #1a1a1a !important;
+    stroke: #666666 !important;
+}
+[data-md-color-scheme="slate"] .mermaid path.path {
+    stroke: #888888 !important;
+}
+[data-md-color-scheme="slate"] .mermaid .edgeLabel rect {
+    fill: #2d2d2d !important;
+}
+[data-md-color-scheme="slate"] .mermaid marker path {
+    fill: #888888 !important;
+    stroke: #888888 !important;
 }
 
 /* Sticky footer - push footer to bottom on short pages */
@@ -134,6 +238,8 @@ input[type="password"] {
     border: 1px solid #6EB7CE;
     padding: 1em;
     font-size: .8rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 ::placeholder {
@@ -170,6 +276,19 @@ input[type="password"] {
     color: white;
 }
 
+.badge-new {
+    background-color: #FF6178;
+    color: #ffffff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.65em;
+    font-weight: 700;
+    vertical-align: middle;
+    margin-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 .password-note {
     font-size: 0.85em;
     color: #666;
@@ -201,6 +320,9 @@ input[type="password"] {
 .feature-item h2 {
     margin-top: 0 !important;
     color: var(--md-primary-fg-color);
+}
+[data-md-color-scheme="slate"] .feature-item h2 {
+    color: #ffffff;
 }
 
 .feature-item .badge {
