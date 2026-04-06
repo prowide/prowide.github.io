@@ -32,7 +32,7 @@ h1, h2, h3, h4, h5, h6,
 
 h1, .md-typeset h1 {
     font-weight: 500 !important;
-    color: #1a1a2e !important;
+    color: #2e4369 !important;
 }
 
 [data-md-color-scheme="slate"] h1,
@@ -45,9 +45,49 @@ h1, .md-typeset h1 {
     color: #ffffff !important;
 }
 
-/* Header logo alignment */
+/* Hide empty announcement bar */
+.md-banner {
+    display: none;
+}
+
+/* Header — breathing room */
+.md-header {
+    padding-top: 0.4rem;
+}
+
+/* Header logo + title — baseline aligned */
+.md-header__button.md-logo {
+    padding: 0;
+    margin-right: 0.4rem;
+    align-self: flex-end;
+    margin-bottom: 0.45rem;
+}
 .md-header__button.md-logo img {
-    margin-bottom: 0.4rem;
+    height: 1.8rem;
+    display: block;
+}
+
+/* Title sits at bottom to baseline-align with logo text */
+.md-header__topic {
+    align-self: flex-end;
+    margin-bottom: 0.45rem;
+}
+.md-header__topic .md-ellipsis {
+    font-weight: 600;
+    margin-top: 9px;
+}
+
+/* Header "Back to site" — readable */
+.md-source {
+    opacity: 1 !important;
+    transition: opacity 0.2s;
+}
+.md-source:hover {
+    opacity: 0.7 !important;
+}
+.md-source__repository {
+    font-size: 0.6rem;
+    color: rgba(255, 255, 255, 0.9) !important;
 }
 
 /* Navigation refinements */
@@ -65,8 +105,8 @@ h1, .md-typeset h1 {
 }
 
 .md-tabs__link {
-    font-weight: 500;
-    letter-spacing: 0.3px;
+    font-weight: 400;
+    letter-spacing: 0.4px;
 }
 
 .md-tabs__link--active,
@@ -78,19 +118,58 @@ h1, .md-typeset h1 {
 /* Button styling */
 .md-button {
     font-family: 'Open Sans', sans-serif;
-    font-weight: 400;
+    font-weight: 600;
     letter-spacing: 0.5px;
-    border-radius: 3px;
+    border-radius: 6px;
 }
 
 .md-button--primary {
-    background-color: #2E4369;
-    border-color: #2E4369;
+    background-color: #FF6178;
+    border-color: #FF6178;
 }
 
 .md-button--primary:hover {
+    background-color: #e8556b;
+    border-color: #e8556b;
+}
+
+/* Cookie consent buttons - match corporate style */
+.md-consent__inner .md-button {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 13px 26px;
+    border-radius: 6px;
+    border-width: 1.5px;
+}
+.md-consent__inner .md-button--primary {
     background-color: #FF6178;
     border-color: #FF6178;
+    color: #fff;
+}
+.md-consent__inner .md-button--primary:hover {
+    background-color: #e8556b;
+    border-color: #e8556b;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(255, 97, 120, 0.25);
+}
+.md-consent__inner .md-button:not(.md-button--primary) {
+    background: transparent;
+    color: var(--md-primary-fg-color);
+    border-color: var(--md-primary-fg-color);
+}
+.md-consent__inner .md-button:not(.md-button--primary):hover {
+    background: rgba(46, 67, 105, 0.06);
+}
+
+/* Inline code - corporate style */
+.md-typeset code:not(pre code) {
+    background: rgba(46, 67, 105, 0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+[data-md-color-scheme="slate"] .md-typeset code:not(pre code) {
+    background: rgba(255, 255, 255, 0.08);
 }
 
 /* Subtle shadows */
@@ -111,39 +190,43 @@ h1, .md-typeset h1 {
     background-color: rgba(110, 183, 206, 0.12);
 }
 
-/* Admonition left border - Light Blue accent */
+/* Admonition styling — keep Material's native type colors */
 .md-typeset .admonition,
 .md-typeset details {
-    border-left-color: #6EB7CE !important;
+    border-radius: 6px;
 }
 
-/* Code block left border
-   Note: border must be on .highlight (the wrapper div), not on pre or code.
-   The background is set on the inner <code> element, so a border on <pre>
-   ends up hidden behind it. */
+/* Code blocks - rounded corners matching corporate style */
 .md-typeset .highlight {
-    border-left: 3px solid #6EB7CE;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
-/* Horizontal rules */
+/* Horizontal rules - subtle corporate dividers */
 .md-typeset hr {
-    border-color: rgba(110, 183, 206, 0.4);
+    border-color: rgba(46, 67, 105, 0.06);
+}
+[data-md-color-scheme="slate"] .md-typeset hr {
+    border-color: rgba(255, 255, 255, 0.06);
 }
 
-/* Link hover */
+/* Links - corporate style: inherit color, accent on hover */
+.md-typeset a {
+    color: var(--md-primary-fg-color);
+}
 .md-typeset a:hover {
     color: var(--md-accent-fg-color);
 }
 
-/* Nav section dividers - Light Blue tint */
+/* Nav section dividers */
 .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__container > a.md-nav__link {
     margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(110, 183, 206, 0.4);
+    border-bottom: 1px solid rgba(46, 67, 105, 0.06);
     display: block;
 }
 [data-md-color-scheme="slate"] .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__container > a.md-nav__link {
-    border-bottom: 1px solid rgba(110, 183, 206, 0.25);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* Indent third-level nav items */
@@ -233,13 +316,31 @@ h1, .md-typeset h1 {
     flex: 1;
 }
 
-/* Form elements */
-input[type="password"] {
-    border: 1px solid #6EB7CE;
-    padding: 1em;
-    font-size: .8rem;
-    width: 100%;
-    box-sizing: border-box;
+/* Footer - smaller font matching corporate */
+.md-footer {
+    font-size: 0.65rem;
+}
+.md-footer-meta {
+    font-size: 0.6rem;
+}
+.md-copyright {
+    font-size: 0.6rem;
+}
+
+/* Form elements — encryptcontent password input */
+#mkdocs-content-password {
+    border: 1px solid #B0BEC5 !important;
+    border-radius: 6px !important;
+    padding: 1em !important;
+    font-size: .8rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    outline: none !important;
+    transition: border-color 0.2s !important;
+    margin-bottom: 4px !important;
+}
+#mkdocs-content-password:focus {
+    border-color: #6EB7CE !important;
 }
 
 ::placeholder {
@@ -255,13 +356,21 @@ input[type="password"] {
     color: grey;
 }
 
+/* Body text - matching corporate site */
+body, .md-typeset {
+    font-weight: 300;
+}
+[data-md-color-scheme="prowide-default"] .md-typeset {
+    color: #2e4369;
+}
+
 /* Product badges */
 .badge {
     display: inline-block;
     padding: 0.25em 0.6em;
     font-size: 0.75rem;
     font-weight: 500;
-    border-radius: 3px;
+    border-radius: 6px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -280,7 +389,7 @@ input[type="password"] {
     background-color: #FF6178;
     color: #ffffff;
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 0.65em;
     font-weight: 700;
     vertical-align: middle;
@@ -297,14 +406,18 @@ input[type="password"] {
 
 /* Product cards enhancement */
 .feature-item {
-    background: var(--md-default-bg-color);
-    border: 1px solid var(--pw-border);
-    border-radius: 6px;
-    padding: 1.5rem !important;
+    background: #f5f7f9;
+    border: 1px solid rgba(46, 67, 105, 0.06);
+    border-radius: 12px;
+    padding: 24px 22px !important;
     margin: 0 10px;
     transition: box-shadow 0.2s ease, transform 0.2s ease;
     display: flex;
     flex-direction: column;
+}
+[data-md-color-scheme="slate"] .feature-item {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .feature-item p:last-child {
@@ -313,8 +426,8 @@ input[type="password"] {
 }
 
 .feature-item:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
+    box-shadow: 0 12px 36px rgba(46, 67, 105, 0.08);
+    transform: translateY(-3px);
 }
 
 .feature-item h2 {
@@ -329,6 +442,43 @@ input[type="password"] {
     margin-bottom: 0.75rem;
 }
 
+/* Section labels - corporate style */
+.section-label {
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    color: #2e4369;
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 8px;
+}
+[data-md-color-scheme="slate"] .section-label {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Tier labels - corporate text-only style */
+.tier-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.tier-label--navy {
+    color: #2e4369;
+}
+.tier-label--lb {
+    color: #6EB7CE;
+}
+.tier-label--wm {
+    color: #FF6178;
+}
+[data-md-color-scheme="slate"] .tier-label--navy {
+    color: rgba(255, 255, 255, 0.6);
+}
+
 .top-hr {
-    padding-bottom: 2rem;
+    padding-bottom: 1rem;
 }

@@ -9,15 +9,29 @@
         display: flex;
     }
 
+    /* No min-height on home — content determines page height, no empty gap */
+    .md-container {
+        min-height: 0 !important;
+    }
+
+    .md-content__inner {
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
     .tx-container {
         padding-top: .0rem;
-        background: var(--md-primary-fg-color);
+        background: linear-gradient(135deg, #2e4369, #3a5580 60%, #6eb7ce 100%);
+    }
+
+    [data-md-color-scheme="slate"] .tx-container {
+        background: var(--md-default-bg-color);
     }
 
     .tx-hero {
         margin: 32px 2.8rem;
         color: var(--md-primary-bg-color);
-        justify-content: center;
+        justify-content: flex-start;
     }
 
     .tx-hero h1 {
@@ -47,20 +61,33 @@
     .tx-hero .md-button {
         margin-top: .5rem;
         margin-right: .5rem;
-        color: var(--md-primary-bg-color)
+        color: #ffffff;
+        padding: 13px 26px;
+        font-size: 14px;
+        font-weight: 700;
+        border-radius: 6px;
+        border: 1.5px solid rgba(255,255,255,0.2);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
     }
 
     .tx-hero .md-button--primary {
-        background-color: var(--md-primary-bg-color);
-        color: var(--md-primary-fg-color);
-        border-color: var(--md-primary-bg-color)
+        background-color: #FF6178;
+        color: #ffffff;
+        border-color: #FF6178;
     }
 
-    .tx-hero .md-button:focus,
-    .tx-hero .md-button:hover {
-        background-color: var(--md-accent-fg-color);
-        color: var(--md-default-bg-color);
-        border-color: var(--md-accent-fg-color)
+    .tx-hero .md-button--primary:focus,
+    .tx-hero .md-button--primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(255, 97, 120, 0.25);
+        background-color: #e8556b;
+        border-color: #e8556b;
+    }
+
+    .tx-hero .md-button:not(.md-button--primary):focus,
+    .tx-hero .md-button:not(.md-button--primary):hover {
+        border-color: rgba(255,255,255,0.4);
+        background-color: rgba(255,255,255,0.04);
     }
 
     .feature-item h2 svg {
@@ -71,7 +98,7 @@
     }
 
     .top-hr {
-        margin-top: 42px;
+        margin-top: 16px;
     }
 
     .feature-item {
@@ -82,24 +109,25 @@
     }
 
     .feature-item h2 {
-        font-weight: 300;
-        font-size: 1.2rem;
+        font-weight: 500;
+        font-size: 0.85rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         line-height: normal;
-        margin-top: 20px;
-        margin-bottom: 10px;
-        font-family: inherit;
+        margin-top: 6px;
+        margin-bottom: 8px;
+        font-family: 'Barlow', sans-serif;
     }
 
     .feature-item p {
-        font-size: 0.85rem;
-        line-height: 1.6;
+        font-size: 0.7rem;
+        line-height: 1.5;
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
-        margin: 0 0 10px;
+        margin: 0 0 6px;
         display: block;
+        color: #78909c;
     }
 
     @media screen and (max-width:30em) {
@@ -116,7 +144,7 @@
         .tx-hero {
             display: flex;
             align-items: flex-end;
-            justify-content: center;
+            justify-content: flex-start;
         }
 
         .tx-hero__content {
@@ -159,7 +187,7 @@
         }
 
         .feature-item:hover {
-            border-radius: 3px;
+            border-radius: 12px;
         }
     }
 
@@ -202,16 +230,6 @@
         margin-bottom: 30px;
     }
 
-    .md-footer-meta__inner {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        margin-top: 1.0rem;
-    }
-
-    .md-footer-social {
-        padding-top: 20px;
-    }
 </style>
 
 <!-- Hero Section -->
@@ -222,7 +240,7 @@
                 <h1>Developer Documentation</h1>
                 <p>Technical guides and API reference for building applications with Prowide libraries for SWIFT MT and ISO 20022 messaging.</p>
                 <a href="{{ page.next_page.url | url }}" title="{{ page.next_page.title | striptags }}" class="md-button md-button--primary">
-                    Get started
+                    Get started &rarr;
                 </a>
                 <a href="https://github.com/prowide" title="Prowide GitHub" class="md-button">
                     GitHub
@@ -235,7 +253,7 @@
     function updateLinkTitles() {
         const sourceLinks = document.querySelectorAll('.md-source[title="Go to repository"]');
         sourceLinks.forEach(function(link) {
-            link.setAttribute('title', 'Go to Prowide Site');
+            link.setAttribute('title', 'Back to Prowide website');
         });
     }
 
@@ -246,10 +264,11 @@
 
 {% block content %}
 <!-- Product Documentation Cards -->
+<p class="section-label">Product Documentation</p>
 <div class="top-hr">
     <div class="feature-item">
+        <span class="tier-label tier-label--navy">Open Source Libraries</span>
         <h2>Prowide Core</h2>
-        <p><span class="badge badge-open">Open Source</span></p>
         <p>Parse, build, and manipulate SWIFT MT (FIN) messages in Java. Available on Maven Central.</p>
         <p>
             <a href="/latest/open-source/core/">Documentation</a> ·
@@ -258,8 +277,8 @@
         </p>
     </div>
     <div class="feature-item">
+        <span class="tier-label tier-label--navy">Open Source Libraries</span>
         <h2>Prowide ISO 20022</h2>
-        <p><span class="badge badge-open">Open Source</span></p>
         <p>Complete Java model for ISO 20022 (MX) messages with full schema support. Available on Maven Central.</p>
         <p>
             <a href="/latest/open-source/iso20022/">Documentation</a> ·
@@ -268,8 +287,8 @@
         </p>
     </div>
     <div class="feature-item">
+        <span class="tier-label tier-label--lb">Licensed Java Libraries</span>
         <h2>Prowide Integrator</h2>
-        <p><span class="badge badge-licensed">Licensed</span></p>
         <p>Validation, translations, and custom format mapping. Extended functionality built on top of the open source libraries.</p>
         <p>
             <a href="/latest/integrator/">Documentation</a> <span class="password-note">(password protected)</span>
